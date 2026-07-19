@@ -1,65 +1,195 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import BottomNav from "@/components/BottomNav";
+import { DEVICE_META } from "@/lib/data";
+import { getDevices, getCurrentMemberView, logout } from "@/lib/store";
+
+type Device = ReturnType<typeof getDevices>[number];
+type Member = ReturnType<typeof getCurrentMemberView>;
+
+export default function HomePage() {
+  const router = useRouter();
+  const [devices, setDevices] = useState<Device[]>([]);
+  const [member, setMember] = useState<Member>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      setDevices(getDevices());
+      setMember(getCurrentMemberView());
+      setLoading(false);
+    });
+  }, []);
+
+  function handleLogout() {
+    logout();
+    setMember(null);
+  }
+
+  // Group devices by type so the home screen shows one card per category,
+  // like the original preview (rather than 9 separate PC tiles).
+  const grouped = devices.reduce<
+    Record<string, { total: number; free: number }>
+  >((acc, d) => {
+    acc[d.type] = acc[d.type] ?? { total: 0, free: 0 };
+    acc[d.type].total += 1;
+    if (d.isFreeNow) acc[d.type].free += 1;
+    return acc;
+  }, {});
+  const freeCount = devices.filter((d) => d.isFreeNow).length;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="pb-6">
+      {/* top bar (mobile only — desktop uses SiteHeader) */}
+      <div className="flex items-center justify-between px-[18px] pt-[18px] pb-2.5 md:hidden">
+        <div className="font-display text-xl flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-sm bg-lime shadow-[0_0_10px_var(--lime)] pulse-dot" />
+          LEVEL UP
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        {member ? (
+          <button
+            onClick={handleLogout}
+            className="text-xs text-text-dim bg-card border border-line px-2.5 py-1.5 rounded-full"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            {member.membershipStatus === "APPROVED"
+              ? member.tierInfo.icon
+              : "⏳"}{" "}
+            {member.name.split(" ")[0]}
+          </button>
+        ) : (
+          <Link
+            href="/login"
+            className="text-xs text-text-dim bg-card border border-line px-2.5 py-1.5 rounded-full"
           >
-            Documentation
-          </a>
+            👤 Login
+          </Link>
+        )}
+      </div>
+
+      {/* member status card */}
+      {member && (
+        <div
+          className={`mx-[18px] md:mx-0 mt-2.5 mb-1 p-4 rounded-2xl border flex items-center justify-between md:max-w-sm ${
+            member.membershipStatus === "APPROVED"
+              ? "border-gold bg-gradient-to-br from-[var(--gold-dim)] to-card"
+              : "border-line bg-card"
+          }`}
+        >
+          <div>
+            <div className="font-bold text-[15px]">
+              {member.membershipStatus === "APPROVED"
+                ? member.tierInfo.icon
+                : "⏳"}{" "}
+              {member.name}
+            </div>
+            <div
+              className={`text-[11.5px] font-bold mt-0.5 ${
+                member.membershipStatus === "APPROVED"
+                  ? "text-gold"
+                  : "text-text-dim"
+              }`}
+            >
+              {member.membershipStatus === "APPROVED"
+                ? `${member.tierInfo.label} · ${Math.round(member.tierInfo.discount * 100)}% off bookings`
+                : "Membership pending admin approval"}
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="font-display text-xl text-gold font-bold">
+              {member.points}
+            </div>
+            <div className="text-[10px] text-text-dim">points</div>
+          </div>
         </div>
-      </main>
+      )}
+
+      {/* occupancy strip */}
+      <div className="mx-[18px] md:mx-0 mt-2.5 mb-1 p-3 rounded-2xl bg-card border border-line flex items-center justify-between text-[13px] text-text-dim md:max-w-sm">
+        <span>
+          <b className="text-lime font-bold">{loading ? "…" : freeCount}</b>{" "}
+          devices free right now
+        </span>
+        <span>🟢 open till 1AM</span>
+      </div>
+
+      {/* hero */}
+      <div className="px-[18px] md:px-0 pt-4 md:pt-8 pb-1.5">
+        <h1 className="font-display text-3xl md:text-5xl leading-tight font-bold mb-1">
+          Pick your <span className="text-pink">rig.</span>
+          <br />
+          Lock your slot.
+        </h1>
+        <p className="text-text-dim text-[13.5px]">
+          Just your phone number. No forms, no queueing at the counter.
+        </p>
+      </div>
+
+      {/* entry cards for guests */}
+      {!member && (
+        <div className="flex gap-2.5 px-[18px] md:px-0 pt-3 pb-1 md:max-w-lg">
+          <div className="flex-1 p-4 rounded-2xl text-center border border-line bg-card">
+            <div className="text-xl mb-1.5">⚡</div>
+            <div className="font-bold text-sm">Book as guest</div>
+            <div className="text-[11px] text-text-dim mt-1 leading-tight">
+              Just your phone number, get a token instantly
+            </div>
+          </div>
+          <Link
+            href="/login"
+            className="flex-1 p-4 rounded-2xl text-center border border-gold bg-[var(--gold-dim)]"
+          >
+            <div className="text-xl mb-1.5">🏆</div>
+            <div className="font-bold text-sm text-gold">Member login</div>
+            <div className="text-[11px] text-text-dim mt-1 leading-tight">
+              Get your discount + points on this booking
+            </div>
+          </Link>
+        </div>
+      )}
+
+      {/* device categories */}
+      <div className="px-[18px] md:px-0 pt-5 md:pt-8 pb-2 text-[12px] tracking-wider text-text-dim uppercase font-semibold">
+        Choose a device
+      </div>
+      <div className="px-[18px] md:px-0 grid grid-cols-1 md:grid-cols-3 gap-2.5 md:gap-4">
+        {Object.entries(DEVICE_META).map(([type, meta]) => {
+          const stats = grouped[type];
+          return (
+            <button
+              key={type}
+              onClick={() => router.push(`/book?type=${type}`)}
+              className="flex items-center justify-between bg-card border border-line rounded-2xl px-4 py-3.5 text-left active:scale-[0.98] transition"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-bg-soft flex items-center justify-center text-xl">
+                  {meta.icon}
+                </div>
+                <div>
+                  <div className="font-bold text-[15px]">{meta.title}</div>
+                  <div className="text-xs text-text-dim mt-0.5">{meta.sub}</div>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <span
+                  className={`text-[11.5px] font-semibold px-2.5 py-1 rounded-full ${
+                    stats && stats.free > 0
+                      ? "bg-(--lime-dim) text-lime"
+                      : "bg-[#3a354622] text-text-dim"
+                  }`}
+                >
+                  {stats ? `${stats.free} free` : "—"}
+                </span>
+                <span className="text-text-dim ml-2">›</span>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      <BottomNav />
     </div>
   );
 }
