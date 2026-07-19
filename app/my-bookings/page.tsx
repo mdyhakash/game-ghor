@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import BottomNav from "@/components/BottomNav";
 import { getCurrentMember, getMyBookings } from "@/lib/store";
+import { RiGamepadLine } from "react-icons/ri";
 
 type Bookings = NonNullable<ReturnType<typeof getMyBookings>>;
 
@@ -51,7 +52,7 @@ export default function MyBookingsPage() {
         <div className="text-center px-8 py-16 text-text-dim text-[13.5px]">
           No tokens yet.
           <br />
-          Go book a slot 🎮
+          Go book a slot <RiGamepadLine size={14} className="inline-block" />
         </div>
       ) : (
         <div className="px-[18px] md:px-0 grid grid-cols-1 md:grid-cols-2 gap-3">

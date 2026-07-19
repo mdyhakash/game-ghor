@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getCurrentMemberView, logout } from "@/lib/store";
+import { RiUserLine, RiLogoutBoxLine } from "react-icons/ri";
+import GameIcon from "@/components/GameIcon";
 
 const items = [
   { href: "/", label: "Home" },
@@ -38,7 +40,7 @@ export default function Header() {
             className="font-display text-xl flex items-center gap-2"
           >
             <span className="w-2.5 h-2.5 rounded-sm bg-lime shadow-[0_0_10px_var(--lime)] pulse-dot" />
-            LEVEL UP
+            Game Ghor
           </Link>
           <nav className="flex items-center gap-6">
             {items.map((item) => {
@@ -65,14 +67,17 @@ export default function Header() {
               onClick={handleLogout}
               className="text-xs font-semibold text-text-dim bg-card border border-line px-3 py-1.5 rounded-full hover:text-text"
             >
-              {member.tierInfo.icon} {member.name.split(" ")[0]} · Log out
+              <GameIcon iconKey={member.tierInfo.iconKey} size={14} />{" "}
+              {member.name.split(" ")[0]}
+              <RiLogoutBoxLine size={13} className="ml-1 inline-block" />
+              {" "}Log out
             </button>
           ) : (
             <Link
               href="/login"
               className="text-xs font-semibold text-text-dim bg-card border border-line px-3 py-1.5 rounded-full hover:text-text"
             >
-              👤 Login
+              <RiUserLine size={13} className="mr-1 inline-block" /> Login
             </Link>
           )}
         </div>

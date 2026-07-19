@@ -2,11 +2,29 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+  RiHomeLine,
+  RiHome2Fill,
+  RiBookOpenLine,
+  RiBookOpenFill,
+  RiTicketLine,
+  RiTicket2Fill,
+} from "react-icons/ri";
 
 const items = [
-  { href: "/", label: "Home", icon: "🏠" },
-  { href: "/book", label: "Book", icon: "⚡" },
-  { href: "/my-bookings", label: "Tokens", icon: "🎟️" },
+  { href: "/", label: "Home", icon: RiHomeLine, activeIcon: RiHome2Fill },
+  {
+    href: "/book",
+    label: "Book",
+    icon: RiBookOpenLine,
+    activeIcon: RiBookOpenFill,
+  },
+  {
+    href: "/my-bookings",
+    label: "Tokens",
+    icon: RiTicketLine,
+    activeIcon: RiTicket2Fill,
+  },
 ];
 
 export default function BottomNav() {
@@ -15,7 +33,9 @@ export default function BottomNav() {
   return (
     <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-bg-soft border-t border-line flex px-3 pt-2.5 pb-4 md:hidden">
       {items.map((item) => {
-        const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+        const active =
+          item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+        const Icon = active ? item.activeIcon : item.icon;
         return (
           <Link
             key={item.href}
@@ -24,7 +44,7 @@ export default function BottomNav() {
               active ? "text-pink" : "text-text-dim"
             }`}
           >
-            <span className="text-lg">{item.icon}</span>
+            <Icon size={22} />
             {item.label}
           </Link>
         );

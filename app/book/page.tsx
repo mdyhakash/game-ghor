@@ -6,6 +6,7 @@ import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
 import { TYPE_LABEL, type DeviceType } from "@/lib/data";
 import { getSlots, getCurrentMemberView, createBooking } from "@/lib/store";
+import { RiArrowLeftLine } from "react-icons/ri";
 
 type Slot = { startTime: string; label: string; available: boolean };
 type Member = ReturnType<typeof getCurrentMemberView>;
@@ -79,9 +80,9 @@ function BookPageInner() {
       <div className="flex items-center gap-2.5 px-[18px] md:px-0 pt-4 pb-1.5">
         <Link
           href="/"
-          className="w-[34px] h-[34px] rounded-[10px] bg-card border border-line flex items-center justify-center text-base"
+          className="w-[34px] h-[34px] rounded-[10px] bg-card border border-line flex items-center justify-center"
         >
-          ←
+          <RiArrowLeftLine size={18} />
         </Link>
         <div>
           <div className="font-display text-lg font-bold">{TYPE_LABEL[deviceType]}</div>

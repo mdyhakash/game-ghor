@@ -4,8 +4,20 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import BottomNav from "@/components/BottomNav";
-import { DEVICE_META } from "@/lib/data";
+import GameIcon from "@/components/GameIcon";
+import { DEVICE_META, CAFE_PHONE, CAFE_PHONE_DISPLAY } from "@/lib/data";
 import { getDevices, getCurrentMemberView, logout } from "@/lib/store";
+import {
+  RiUserLine,
+  RiLogoutBoxLine,
+  RiTrophyLine,
+  RiTimeLine,
+  RiRadioButtonFill,
+  RiArrowRightSLine,
+} from "react-icons/ri";
+import GamesAvailable from "@/components/GamesAvailable";
+import { RiPhoneLine } from "react-icons/ri";
+import Footer from "@/components/Footer";
 
 type Device = ReturnType<typeof getDevices>[number];
 type Member = ReturnType<typeof getCurrentMemberView>;
@@ -47,16 +59,18 @@ export default function HomePage() {
       <div className="flex items-center justify-between px-[18px] pt-[18px] pb-2.5 md:hidden">
         <div className="font-display text-xl flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-sm bg-lime shadow-[0_0_10px_var(--lime)] pulse-dot" />
-          LEVEL UP
+          Game Ghor
         </div>
         {member ? (
           <button
             onClick={handleLogout}
             className="text-xs text-text-dim bg-card border border-line px-2.5 py-1.5 rounded-full"
           >
-            {member.membershipStatus === "APPROVED"
-              ? member.tierInfo.icon
-              : "⏳"}{" "}
+            {member.membershipStatus === "APPROVED" ? (
+              <GameIcon iconKey={member.tierInfo.iconKey} size={14} />
+            ) : (
+              <RiTimeLine size={14} className="inline-block" />
+            )}{" "}
             {member.name.split(" ")[0]}
           </button>
         ) : (
@@ -64,7 +78,7 @@ export default function HomePage() {
             href="/login"
             className="text-xs text-text-dim bg-card border border-line px-2.5 py-1.5 rounded-full"
           >
-            👤 Login
+            <RiUserLine size={13} className="inline-block mr-0.5" /> Login
           </Link>
         )}
       </div>
@@ -80,9 +94,11 @@ export default function HomePage() {
         >
           <div>
             <div className="font-bold text-[15px]">
-              {member.membershipStatus === "APPROVED"
-                ? member.tierInfo.icon
-                : "⏳"}{" "}
+              {member.membershipStatus === "APPROVED" ? (
+                <GameIcon iconKey={member.tierInfo.iconKey} size={16} />
+              ) : (
+                <RiTimeLine size={16} className="inline-block" />
+              )}{" "}
               {member.name}
             </div>
             <div
@@ -112,8 +128,22 @@ export default function HomePage() {
           <b className="text-lime font-bold">{loading ? "…" : freeCount}</b>{" "}
           devices free right now
         </span>
-        <span>🟢 open till 1AM</span>
+        <span>
+          <RiRadioButtonFill
+            size={12}
+            className="inline-block text-lime mr-1"
+          />
+          open till 1AM
+        </span>
+        {/* call to book */}
       </div>
+      <a
+        href={`tel:${CAFE_PHONE}`}
+        className="mx-[18px] md:mx-0 mt-2 mb-1 flex items-center justify-center gap-2 p-3 rounded-2xl bg-card border border-line text-[13px] font-semibold text-lime active:scale-[0.98] transition md:max-w-sm"
+      >
+        <RiPhoneLine size={16} />
+        Call to book — {CAFE_PHONE_DISPLAY}
+      </a>
 
       {/* hero */}
       <div className="px-[18px] md:px-0 pt-4 md:pt-8 pb-1.5">
@@ -129,9 +159,11 @@ export default function HomePage() {
 
       {/* entry cards for guests */}
       {!member && (
-        <div className="flex gap-2.5 px-[18px] md:px-0 pt-3 pb-1 md:max-w-lg">
+        <div className="flex gap-2.5 px-[18px] md:px-0 pt-3 pb-1">
           <div className="flex-1 p-4 rounded-2xl text-center border border-line bg-card">
-            <div className="text-xl mb-1.5">⚡</div>
+            <div className="text-xl mb-1.5 flex justify-center">
+              <RiTrophyLine size={24} />
+            </div>
             <div className="font-bold text-sm">Book as guest</div>
             <div className="text-[11px] text-text-dim mt-1 leading-tight">
               Just your phone number, get a token instantly
@@ -141,7 +173,9 @@ export default function HomePage() {
             href="/login"
             className="flex-1 p-4 rounded-2xl text-center border border-gold bg-[var(--gold-dim)]"
           >
-            <div className="text-xl mb-1.5">🏆</div>
+            <div className="text-xl mb-1.5 flex justify-center text-gold">
+              <RiTrophyLine size={24} />
+            </div>
             <div className="font-bold text-sm text-gold">Member login</div>
             <div className="text-[11px] text-text-dim mt-1 leading-tight">
               Get your discount + points on this booking
@@ -165,7 +199,7 @@ export default function HomePage() {
             >
               <div className="flex items-center gap-3">
                 <div className="w-11 h-11 rounded-xl bg-bg-soft flex items-center justify-center text-xl">
-                  {meta.icon}
+                  <GameIcon iconKey={meta.iconKey} size={24} />
                 </div>
                 <div>
                   <div className="font-bold text-[15px]">{meta.title}</div>
@@ -182,14 +216,18 @@ export default function HomePage() {
                 >
                   {stats ? `${stats.free} free` : "—"}
                 </span>
-                <span className="text-text-dim ml-2">›</span>
+                <span className="text-text-dim ml-2">
+                  <RiArrowRightSLine size={18} />
+                </span>
               </div>
             </button>
           );
         })}
       </div>
+      <GamesAvailable />
 
       <BottomNav />
+      <Footer />
     </div>
   );
 }

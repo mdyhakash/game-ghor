@@ -4,8 +4,10 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import BottomNav from "@/components/BottomNav";
+import GameIcon from "@/components/GameIcon";
 import { TIER_INFO } from "@/lib/data";
 import { getBookingById } from "@/lib/store";
+import { RiArrowLeftLine, RiFireLine, RiAlertLine, RiTimeLine } from "react-icons/ri";
 
 type BookingView = NonNullable<ReturnType<typeof getBookingById>>;
 
@@ -62,13 +64,13 @@ export default function TokenPage() {
       <div className="flex items-center gap-2.5 px-[18px] md:px-0 pt-4 pb-1.5">
         <Link
           href="/"
-          className="w-[34px] h-[34px] rounded-[10px] bg-card border border-line flex items-center justify-center text-base"
+          className="w-[34px] h-[34px] rounded-[10px] bg-card border border-line flex items-center justify-center"
         >
-          ←
+          <RiArrowLeftLine size={18} />
         </Link>
         <div>
-          <div className="font-display text-lg font-bold">
-            You&apos;re locked in 🔥
+          <div className="font-display text-lg font-bold flex items-center gap-1.5">
+            You&apos;re locked in <RiFireLine size={18} className="text-orange-400" />
           </div>
           <div className="text-xs text-text-dim">
             Show this token at the counter
@@ -99,8 +101,8 @@ export default function TokenPage() {
 
           {member && tierInfo && (
             <div className="flex items-center justify-between mt-3.5 bg-[var(--gold-dim)] border border-gold rounded-[10px] px-3 py-2">
-              <span className="text-[12.5px] font-bold text-gold">
-                {tierInfo.icon} {tierInfo.label}
+              <span className="text-[12.5px] font-bold text-gold flex items-center gap-1.5">
+                <GameIcon iconKey={tierInfo.iconKey} size={14} /> {tierInfo.label}
               </span>
               <span className="text-[11.5px] text-gold">
                 +{booking.pointsEarned} pts earned
@@ -108,8 +110,8 @@ export default function TokenPage() {
             </div>
           )}
           {member && !tierInfo && (
-            <div className="mt-3.5 bg-bg-soft border border-line rounded-[10px] px-3 py-2 text-[11.5px] text-text-dim">
-              ⏳ Membership pending approval — discount and points apply once
+            <div className="mt-3.5 bg-bg-soft border border-line rounded-[10px] px-3 py-2 text-[11.5px] text-text-dim flex items-center gap-1.5">
+              <RiTimeLine size={14} /> Membership pending approval — discount and points apply once
               approved.
             </div>
           )}
@@ -149,13 +151,9 @@ export default function TokenPage() {
           </div>
         </div>
 
-        {/* <div className="text-center mt-4.5 text-[13px] text-text-dim">
-          Session starts at <b className="text-text">{startLabel}</b>.
-          We&apos;ll ping you 10 min before.
-        </div> */}
         <div className="mt-4 w-full rounded-[14px] border border-amber-500/30 bg-amber-500/10 px-4 py-3">
           <p className="text-[12.5px] text-amber-300">
-            <span className="font-bold">⚠️ Important:</span> If you arrive more
+            <span className="font-bold flex items-center gap-1"><RiAlertLine size={14} /> Important:</span> If you arrive more
             than <span className="font-semibold">10 minutes late</span> after
             your scheduled booking time, your booking will be{" "}
             <span className="font-bold">automatically cancelled</span>.
