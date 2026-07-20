@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import { GAMES } from "@/lib/data";
-import { RiArrowDownSLine } from "react-icons/ri";
 
-const PREVIEW_COUNT = 6; // 4–8 cards on the home page; tune here
+
+const PREVIEW_COUNT = 6;
 
 export default function GamesAvailable() {
   const preview = GAMES.slice(0, PREVIEW_COUNT);
 
   return (
-    <div className="px-[18px] md:px-0 pt-5 md:pt-8 pb-2">
+    <div className="px-4.5 md:px-0 pt-5 md:pt-8 pb-2">
       <div className="text-[12px] tracking-wider text-text-dim uppercase font-semibold mb-2">
         Games available
       </div>
@@ -19,12 +19,12 @@ export default function GamesAvailable() {
         {preview.map((game) => (
           <div
             key={game.id}
-            className={`relative aspect-[3/4] rounded-2xl overflow-hidden border border-line bg-gradient-to-br ${game.color} flex items-end`}
+            className={`relative aspect-3/4 rounded-2xl overflow-hidden border border-line bg-linear-to-br ${game.color} flex items-end`}
           >
             <span className="absolute top-2 left-2 text-[9.5px] font-bold px-2 py-0.5 rounded-full bg-black/40 backdrop-blur text-white">
               {game.genre}
             </span>
-            <div className="w-full p-2.5 bg-gradient-to-t from-black/80 to-transparent">
+            <div className="w-full p-2.5 bg-linear-to-t from-black/80 to-transparent">
               <div className="font-display font-bold text-[13px] leading-tight text-white">
                 {game.title}
               </div>

@@ -9,7 +9,6 @@ import { DEVICE_META, CAFE_PHONE, CAFE_PHONE_DISPLAY } from "@/lib/data";
 import { getDevices, getCurrentMemberView, logout } from "@/lib/store";
 import {
   RiUserLine,
-  RiLogoutBoxLine,
   RiTrophyLine,
   RiTimeLine,
   RiRadioButtonFill,
@@ -41,8 +40,6 @@ export default function HomePage() {
     setMember(null);
   }
 
-  // Group devices by type so the home screen shows one card per category,
-  // like the original preview (rather than 9 separate PC tiles).
   const grouped = devices.reduce<
     Record<string, { total: number; free: number }>
   >((acc, d) => {
@@ -55,8 +52,7 @@ export default function HomePage() {
 
   return (
     <div className="pb-6">
-      {/* top bar (mobile only — desktop uses SiteHeader) */}
-      <div className="flex items-center justify-between px-[18px] pt-[18px] pb-2.5 md:hidden">
+      <div className="flex items-center justify-between px-4.5 pt-4.5 pb-2.5 md:hidden">
         <div className="font-display text-xl flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-sm bg-lime shadow-[0_0_10px_var(--lime)] pulse-dot" />
           Game Ghor
@@ -86,9 +82,9 @@ export default function HomePage() {
       {/* member status card */}
       {member && (
         <div
-          className={`mx-[18px] md:mx-0 mt-2.5 mb-1 p-4 rounded-2xl border flex items-center justify-between md:max-w-sm ${
+          className={`mx-4.5 md:mx-0 mt-2.5 mb-1 p-4 rounded-2xl border flex items-center justify-between md:max-w-sm ${
             member.membershipStatus === "APPROVED"
-              ? "border-gold bg-gradient-to-br from-[var(--gold-dim)] to-card"
+              ? "border-gold bg-linear-to-br from-(--gold-dim) to-card"
               : "border-line bg-card"
           }`}
         >
@@ -123,7 +119,7 @@ export default function HomePage() {
       )}
 
       {/* occupancy strip */}
-      <div className="mx-[18px] md:mx-0 mt-2.5 mb-1 p-3 rounded-2xl bg-card border border-line flex items-center justify-between text-[13px] text-text-dim md:max-w-sm">
+      <div className="mx-4.5 md:mx-0 mt-2.5 mb-1 p-3 rounded-2xl bg-card border border-line flex items-center justify-between text-[13px] text-text-dim md:max-w-sm">
         <span>
           <b className="text-lime font-bold">{loading ? "…" : freeCount}</b>{" "}
           devices free right now
@@ -139,14 +135,14 @@ export default function HomePage() {
       </div>
       <a
         href={`tel:${CAFE_PHONE}`}
-        className="mx-[18px] md:mx-0 mt-2 mb-1 flex items-center justify-center gap-2 p-3 rounded-2xl bg-card border border-line text-[13px] font-semibold text-lime active:scale-[0.98] transition md:max-w-sm"
+        className="mx-4.5 md:mx-0 mt-2 mb-1 flex items-center justify-center gap-2 p-3 rounded-2xl bg-card border border-line text-[13px] font-semibold text-lime active:scale-[0.98] transition md:max-w-sm"
       >
         <RiPhoneLine size={16} />
         Call to book — {CAFE_PHONE_DISPLAY}
       </a>
 
       {/* hero */}
-      <div className="px-[18px] md:px-0 pt-4 md:pt-8 pb-1.5">
+      <div className="px-4.5 md:px-0 pt-4 md:pt-8 pb-1.5">
         <h1 className="font-display text-3xl md:text-5xl leading-tight font-bold mb-1">
           Pick your <span className="text-pink">rig.</span>
           <br />
@@ -159,7 +155,7 @@ export default function HomePage() {
 
       {/* entry cards for guests */}
       {!member && (
-        <div className="flex gap-2.5 px-[18px] md:px-0 pt-3 pb-1">
+        <div className="flex gap-2.5 px-4.5 md:px-0 pt-3 pb-1">
           <div className="flex-1 p-4 rounded-2xl text-center border border-line bg-card">
             <div className="text-xl mb-1.5 flex justify-center">
               <RiTrophyLine size={24} />
@@ -171,7 +167,7 @@ export default function HomePage() {
           </div>
           <Link
             href="/login"
-            className="flex-1 p-4 rounded-2xl text-center border border-gold bg-[var(--gold-dim)]"
+            className="flex-1 p-4 rounded-2xl text-center border border-gold bg-(--gold-dim)"
           >
             <div className="text-xl mb-1.5 flex justify-center text-gold">
               <RiTrophyLine size={24} />
@@ -185,10 +181,10 @@ export default function HomePage() {
       )}
 
       {/* device categories */}
-      <div className="px-[18px] md:px-0 pt-5 md:pt-8 pb-2 text-[12px] tracking-wider text-text-dim uppercase font-semibold">
+      <div className="px-4.5 md:px-0 pt-5 md:pt-8 pb-2 text-[12px] tracking-wider text-text-dim uppercase font-semibold">
         Choose a device
       </div>
-      <div className="px-[18px] md:px-0 grid grid-cols-1 md:grid-cols-3 gap-2.5 md:gap-4">
+      <div className="px-4.5 md:px-0 grid grid-cols-1 md:grid-cols-3 gap-2.5 md:gap-4">
         {Object.entries(DEVICE_META).map(([type, meta]) => {
           const stats = grouped[type];
           return (

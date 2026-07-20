@@ -2,7 +2,7 @@ import { RiPhoneLine, RiMapPin2Line } from "react-icons/ri";
 import { CAFE_PHONE, CAFE_PHONE_DISPLAY, CAFE_ADDRESS } from "@/lib/data";
 const Footer = () => {
   return (
-    <footer className="mx-[18px] md:mx-0 mt-6 pt-5 border-t border-line text-center md:text-left">
+    <footer className="mx-4.5 md:mx-0 mt-6 pt-5 border-t border-line text-center md:text-left">
       <div className="font-display text-base font-bold flex items-center justify-center md:justify-start gap-2">
         <span className="w-2 h-2 rounded-sm bg-lime shadow-[0_0_8px_var(--lime)]" />
         Game Ghor

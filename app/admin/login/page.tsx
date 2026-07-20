@@ -25,12 +25,12 @@ export default function AdminLoginPage() {
 
   return (
     <div className="pb-6 md:max-w-sm md:mx-auto md:mt-16">
-      <div className="px-[18px] md:px-0 pt-6">
+      <div className="px-4.5 md:px-0 pt-6">
         <div className="font-display text-lg font-bold">Admin login</div>
         <div className="text-xs text-text-dim mt-1">Staff only — manage devices and bookings.</div>
       </div>
 
-      <form onSubmit={handleSubmit} className="px-[18px] md:px-0 pt-4">
+      <form onSubmit={handleSubmit} className="px-4.5 md:px-0 pt-4">
         <div className="mb-3.5">
           <label className="text-xs font-semibold text-text-dim mb-1.5 block">Admin password</label>
           <input

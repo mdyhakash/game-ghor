@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { MatchView } from "@/components/BracketView";
+import type { MatchView } from "@/components/admin/bracket/BracketView";
 
 interface RecordResultModalProps {
   match: MatchView;
@@ -58,7 +58,7 @@ export default function RecordResultModal({
                   onClick={() => setResultWinnerId(side.id)}
                   className={`flex items-center justify-between px-3.5 py-3 rounded-xl border text-[13.5px] font-semibold ${
                     resultWinnerId === side.id
-                      ? "border-lime bg-[var(--lime-dim)] text-lime"
+                      ? "border-lime bg-(--lime-dim) text-lime"
                       : "border-line bg-bg-soft text-text"
                   }`}
                 >

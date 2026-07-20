@@ -148,7 +148,7 @@ export default function BracketView({
   }
 
   return (
-    <div className="overflow-x-auto pb-2 -mx-[18px] px-[18px] md:mx-0 md:px-0">
+    <div className="overflow-x-auto pb-2 -mx-4.5 px-4.5 md:mx-0 md:px-0">
       <div style={{ position: "relative", width, height }}>
         {rounds.map((r) => (
           <BracketRound

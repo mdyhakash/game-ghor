@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { getMemberDetail, approveMembership } from "@/lib/store";
-import type { Members } from "../_hooks/useAdminData";
+import type { Members } from "@/hooks/useAdminData";
 import DetailStat from "./DetailStat";
-import { formatDate } from "../_lib/format";
+import { formatDate } from "@/lib/format";
 
 interface MembersTabProps {
   members: Members;
@@ -48,8 +48,8 @@ export default function MembersTab({ members, refresh }: MembersTabProps) {
           No members found.
         </div>
       ) : (
-        <div className="overflow-x-auto -mx-[18px] md:mx-0 px-[18px] md:px-0">
-          <table className="w-full text-[13px] border-collapse min-w-[520px]">
+        <div className="overflow-x-auto -mx-4.5 md:mx-0 px-4.5 md:px-0">
+          <table className="w-full text-[13px] border-collapse min-w-130">
             <thead>
               <tr className="text-left text-text-dim text-[11px] uppercase tracking-wider">
                 <th className="py-2 pr-3">Name</th>
@@ -68,7 +68,7 @@ export default function MembersTab({ members, refresh }: MembersTabProps) {
                   <td className="py-2.5 pr-3 font-semibold">
                     {m.name}
                     {m.membershipStatus === "PENDING" && (
-                      <span className="ml-2 text-[10px] font-bold text-gold bg-[var(--gold-dim)] border border-gold px-1.5 py-0.5 rounded-full align-middle">
+                      <span className="ml-2 text-[10px] font-bold text-gold bg-(--gold-dim) border border-gold px-1.5 py-0.5 rounded-full align-middle">
                         PENDING
                       </span>
                     )}
@@ -113,7 +113,7 @@ export default function MembersTab({ members, refresh }: MembersTabProps) {
             </div>
 
             {memberDetail.member.membershipStatus === "PENDING" ? (
-              <div className="flex items-center justify-between bg-[var(--gold-dim)] border border-gold rounded-xl px-3.5 py-3 mb-4">
+              <div className="flex items-center justify-between bg-(--gold-dim) border border-gold rounded-xl px-3.5 py-3 mb-4">
                 <span className="text-[12.5px] font-bold text-gold">
                   ⏳ Pending approval
                 </span>
@@ -129,7 +129,7 @@ export default function MembersTab({ members, refresh }: MembersTabProps) {
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-2 bg-[var(--lime-dim)] border border-lime rounded-xl px-3.5 py-2.5 mb-4 text-[12.5px] font-bold text-lime">
+              <div className="flex items-center gap-2 bg-(--lime-dim) border border-lime rounded-xl px-3.5 py-2.5 mb-4 text-[12.5px] font-bold text-lime">
                 ✓ Approved member
               </div>
             )}

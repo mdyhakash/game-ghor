@@ -4,10 +4,10 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { isAdminLoggedIn, adminLogout } from "@/lib/store";
-import { useAdminData } from "./_hooks/useAdminData";
-import OverviewTab from "./_components/OverviewTab";
-import MembersTab from "./_components/MembersTab";
-import TournamentsTab from "./_components/admin/TournamentsTab";
+import { useAdminData } from "@/hooks/useAdminData";
+import OverviewTab from "@/components/OverviewTab";
+import MembersTab from "@/components/MembersTab";
+import TournamentsTab from "@/components/admin/TournamentsTab";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -40,7 +40,7 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="pb-10 px-[18px] md:px-0">
+    <div className="pb-10 px-4.5 md:px-0">
       <div className="flex items-center justify-between pt-6 pb-4">
         <div>
           <div className="font-display text-xl font-bold">Admin dashboard</div>
@@ -72,7 +72,7 @@ export default function AdminDashboardPage() {
             onClick={() => setTab(t)}
             className={`px-3.5 py-1.5 rounded-full text-[12.5px] font-semibold border capitalize ${
               tab === t
-                ? "border-pink bg-[var(--pink-dim)] text-pink"
+                ? "border-pink bg-(--pink-dim) text-pink"
                 : "border-line bg-card text-text-dim"
             }`}
           >

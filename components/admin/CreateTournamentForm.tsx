@@ -79,7 +79,7 @@ export default function CreateTournamentForm({
                 onClick={() => setMaxPlayers(n)}
                 className={`flex-1 py-2 rounded-lg text-[12.5px] font-semibold border ${
                   maxPlayers === n
-                    ? "border-pink bg-[var(--pink-dim)] text-pink"
+                    ? "border-pink bg-(--pink-dim) text-pink"
                     : "border-line bg-bg-soft text-text-dim"
                 }`}
               >

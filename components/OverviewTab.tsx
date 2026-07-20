@@ -7,9 +7,9 @@ import {
   getDeviceTypePrice,
 } from "@/lib/store";
 import type { BookingStatus, DeviceStatus, DeviceType } from "@/lib/data";
-import type { Devices, Bookings, Stats } from "../_hooks/useAdminData";
+import type { Devices, Bookings, Stats } from "@/hooks/useAdminData";
 import StatCard from "./StatCard";
-import { formatCountdown } from "../_lib/format";
+import { formatCountdown } from "@/lib/format";
 
 const BOOKING_STATUSES: BookingStatus[] = [
   "WAITING",
