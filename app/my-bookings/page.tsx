@@ -3,32 +3,53 @@
 import { useEffect, useState } from "react";
 import BottomNav from "@/components/BottomNav";
 import { api } from "@/lib/api-client";
+import { getGuestBookingIds } from "@/lib/guest-bookings";
 import type { BookingModel, DeviceModel } from "@/lib/generated/prisma/models";
 import { RiGamepadLine } from "react-icons/ri";
 
-type Bookings = (BookingModel & {
-  device: DeviceModel | null;
-})[];
+type BookingRow = BookingModel & { device: DeviceModel | null };
 
 export default function MyBookingsPage() {
   const [loading, setLoading] = useState(true);
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [bookings, setBookings] = useState<Bookings>([]);
+  const [bookings, setBookings] = useState<BookingRow[]>([]);
 
   useEffect(() => {
-    api
-      .get<Bookings>("/bookings/mine")
-      .then((res) => {
-        setLoggedIn(true);
-        setBookings(res.data);
-      })
-      .catch(() => {
-        setLoggedIn(false);
-        setBookings([]);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    async function load() {
+      const results: BookingRow[] = [];
+
+      // member bookings, if logged in
+      try {
+        const res = await api.get<BookingRow[]>("/bookings/mine");
+        results.push(...res.data);
+      } catch {
+        // not logged in as a member — fine, guest bookings still show below
+      }
+
+      // guest bookings remembered on this device
+      const guestIds = getGuestBookingIds().filter(
+        (id) => !results.some((b) => b.id === id),
+      );
+      const guestResults = await Promise.all(
+        guestIds.map((id) =>
+          api
+            .get<{ booking: BookingModel; device: DeviceModel | null }>(
+              `/bookings/${id}`,
+            )
+            .then((res) => ({ ...res.data.booking, device: res.data.device }))
+            .catch(() => null),
+        ),
+      );
+      results.push(...guestResults.filter((b): b is BookingRow => b !== null));
+
+      results.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
+
+      setBookings(results);
+      setLoading(false);
+    }
+    load();
   }, []);
 
   if (loading) {
@@ -36,22 +57,6 @@ export default function MyBookingsPage() {
       <div className="pb-6 md:max-w-2xl md:mx-auto">
         <div className="px-4.5 md:px-0 pt-4.5 pb-2.5 font-display text-xl">
           My Bookings
-        </div>
-        <BottomNav />
-      </div>
-    );
-  }
-
-  if (!loggedIn) {
-    return (
-      <div className="pb-6 md:max-w-2xl md:mx-auto">
-        <div className="px-4.5 md:px-0 pt-4.5 pb-2.5 font-display text-xl">
-          My Bookings
-        </div>
-        <div className="text-center px-8 py-16 text-text-dim text-[13.5px]">
-          Log in as a member to see your booking history.
-          <br />
-          Guest bookings aren&apos;t saved.
         </div>
         <BottomNav />
       </div>
@@ -75,7 +80,10 @@ export default function MyBookingsPage() {
           {bookings.map((b) => {
             const startLabel = new Date(b.startTime).toLocaleTimeString(
               "en-US",
-              { hour: "numeric", minute: "2-digit" },
+              {
+                hour: "numeric",
+                minute: "2-digit",
+              },
             );
             const endLabel = new Date(b.endTime).toLocaleTimeString("en-US", {
               hour: "numeric",

@@ -22,8 +22,8 @@ export async function GET() {
         select: { deviceId: true },
       }),
       prisma.booking.findMany({
-        where: { createdAt: { gte: baseDate } },
-        select: { finalPrice: true },
+        where: { createdAt: { gte: baseDate }, status: { not: "CANCELLED" } },
+        select: { finalPrice: true, paid: true },
       }),
       prisma.member.count(),
     ]);
@@ -33,11 +33,13 @@ export async function GET() {
     (d) => d.status === "AVAILABLE" && !busyDeviceIds.has(d.id),
   ).length;
 
+  const paidToday = todaysBookings.filter((b) => b.paid);
+
   return NextResponse.json({
     devicesFree,
     devicesTotal: devices.length,
-    bookingsToday: todaysBookings.length,
-    revenueToday: todaysBookings.reduce((sum, b) => sum + b.finalPrice, 0),
+    bookingsToday: paidToday.length,
+    revenueToday: paidToday.reduce((sum, b) => sum + b.finalPrice, 0),
     totalMembers,
   });
 }

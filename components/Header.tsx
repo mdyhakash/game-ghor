@@ -17,6 +17,7 @@ const items = [
 
 export default function Header() {
   const pathname = usePathname();
+  if (pathname?.startsWith("/admin")) return null;
   const [member, setMember] = useState<MemberView | null>(null);
 
   useEffect(() => {

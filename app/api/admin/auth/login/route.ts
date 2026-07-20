@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { setAdminSession } from "@/lib/session";
-import { ADMIN_PASSWORD } from "@/lib/data";
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   const password = body?.password ?? "";
 
-  const expected = process.env.ADMIN_PASSWORD || ADMIN_PASSWORD;
+  const expected = process.env.ADMIN_PASSWORD;
+  if (!expected) {
+    return NextResponse.json(
+      { error: "Server misconfigured: ADMIN_PASSWORD is not set" },
+      { status: 500 },
+    );
+  }
   if (password !== expected) {
     return NextResponse.json(
       { error: "Wrong admin password" },

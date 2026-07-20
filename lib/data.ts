@@ -1,10 +1,14 @@
-// LEVEL UP — static data & shared types (frontend-only build, no DB).
-// This file replaces prisma/schema.prisma + prisma/seed.ts + lib/pricing.ts.
-// Everything the app needs to know about devices, tiers and pricing lives here.
-
 export type Tier = "BRONZE" | "SILVER" | "GOLD" | "DIAMOND";
 export type MembershipStatus = "PENDING" | "APPROVED";
-export type DeviceType = "PC" | "PS4" | "PS5";
+export type DeviceType =
+  | "PC"
+  | "PS3"
+  | "PS4"
+  | "PS5"
+  | "Mobile"
+  | "Racing"
+  | "Arcade"
+  | "VR";
 export type DeviceStatus = "AVAILABLE" | "MAINTENANCE";
 export type BookingStatus = "WAITING" | "ACTIVE" | "COMPLETED" | "CANCELLED";
 
@@ -131,14 +135,54 @@ export const DEVICE_META: Record<
     title: "Gaming PC",
     sub: "RTX rigs · Valorant, CS2, Fortnite",
   },
-  PS5: { iconKey: "PS5", title: "PS5", sub: "Latest titles loaded" },
-  PS4: { iconKey: "PS4", title: "PS4", sub: "FIFA, GTA, and more" },
+
+  PS5: {
+    iconKey: "PS5",
+    title: "PS5",
+    sub: "Latest titles loaded",
+  },
+
+  PS4: {
+    iconKey: "PS4",
+    title: "PS4",
+    sub: "FIFA, GTA, and more",
+  },
+
+  PS3: {
+    iconKey: "PS3",
+    title: "PS3",
+    sub: "FIFA, GTA, and more",
+  },
+
+  Mobile: {
+    iconKey: "Mobile",
+    title: "Mobile",
+    sub: "eFootball, Free Fire, PUBG",
+  },
+
+  Racing: {
+    iconKey: "Racing",
+    title: "Racing Simulator",
+    sub: "Steering wheel & pedal setup",
+  },
+
+  Arcade: {
+    iconKey: "Arcade",
+    title: "Arcade Machine",
+    sub: "Classic arcade games",
+  },
+
+  VR: {
+    iconKey: "VR",
+    title: "VR Gaming",
+    sub: "Immersive virtual reality",
+  },
 };
 // -----------------------------------------------------------------------
 // Contact — placeholder number. Replace both with the real cafe number.
 // -----------------------------------------------------------------------
-export const CAFE_PHONE = "+8801XXXXXXXXX"; // used in tel: link
-export const CAFE_PHONE_DISPLAY = "01XXX-XXXXXX"; // shown to users
+export const CAFE_PHONE = "+8801605586019"; // used in tel: link
+export const CAFE_PHONE_DISPLAY = "+8801605586019"; // shown to users
 export const CAFE_ADDRESS = "House 12, Road 5, Dhanmondi, Dhaka"; // placeholder — replace with real address
 
 // -----------------------------------------------------------------------
@@ -151,7 +195,7 @@ export type Game = {
   title: string;
   genre: string;
   devices: DeviceType[];
-  color: string; // tailwind gradient stops, e.g. "from-[#ff2e93] to-[#7c5cff]"
+  color: string;
   posterUrl?: string;
 };
 
@@ -216,13 +260,18 @@ export const GAMES: Game[] = [
 
 export const TYPE_LABEL: Record<DeviceType, string> = {
   PC: "Gaming PC",
+  PS3: "PS3",
   PS4: "PS4",
   PS5: "PS5",
+  Mobile: "Mobile",
+  Racing: "Racing",
+  Arcade: "Arcade",
+  VR: "VR",
 };
 
 // Cafe hours — hardcoded, tune here.
 export const OPEN_HOUR = 10; // 10 AM
-export const CLOSE_HOUR = 24; // midnight
+export const CLOSE_HOUR = 22; // midnight
 
 export type TournamentStatus = "UPCOMING" | "ONGOING" | "COMPLETED";
 export type MatchStatus = "PENDING" | "COMPLETED";
@@ -272,7 +321,7 @@ export function nextPowerOfTwo(n: number): number {
 // Admin — this is a frontend-only demo, so "auth" is a single shared
 // password rather than real accounts. Change this before sharing the app.
 // -----------------------------------------------------------------------
-export const ADMIN_PASSWORD = "levelup-admin";
+
 
 // -----------------------------------------------------------------------
 // Tiers & pricing — this was lib/pricing.ts.

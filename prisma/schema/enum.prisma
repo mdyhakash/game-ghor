@@ -4,6 +4,9 @@ enum DeviceType {
   PS4
   PS5
   Mobile
+  Racing
+  Arcade
+  VR
 }
 
 enum DeviceStatus {

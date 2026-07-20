@@ -8,6 +8,7 @@ import { TYPE_LABEL, type DeviceType } from "@/lib/data";
 import { api, getErrorMessage } from "@/lib/api-client";
 import type { MemberView } from "@/lib/types";
 import { RiArrowLeftLine } from "react-icons/ri";
+import { addGuestBooking } from "@/lib/guest-bookings";
 
 type Slot = { startTime: string; label: string; available: boolean };
 type Member = MemberView | null;
@@ -85,6 +86,9 @@ function BookPageInner() {
         guestPhone: member ? undefined : phone,
       });
 
+      if (!member) {
+        addGuestBooking(res.data.booking.id);
+      }
       router.push(`/token/${res.data.booking.id}`);
     } catch (err) {
       setError(getErrorMessage(err));
