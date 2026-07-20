@@ -1,9 +1,41 @@
-enum Role {
-  MEMBER
-  ADMIN
+enum DeviceType {
+  PS3
+  PS4
+  PS5
+  Mobile
 }
 
-enum SlotStatus {
+enum DeviceStatus {
   AVAILABLE
-  BOOKED
+  MAINTENANCE
+}
+
+enum Tier {
+  BRONZE
+  SILVER
+  GOLD
+  DIAMOND
+}
+
+enum MembershipStatus {
+  PENDING
+  APPROVED
+}
+
+enum BookingStatus {
+  WAITING
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum TournamentStatus {
+  UPCOMING
+  ONGOING
+  COMPLETED
+}
+
+enum MatchStatus {
+  PENDING
+  COMPLETED
 }

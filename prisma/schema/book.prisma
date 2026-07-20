@@ -1,9 +1,21 @@
 model Booking {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  slotId    String   @unique
-  slot      Slot     @relation(fields: [slotId], references: [id])
+  id              String        @id @default(cuid())
+  token           String        @unique
+  deviceId        String
+  device          Device        @relation(fields: [deviceId], references: [id])
+  memberId        String?
+  member          Member?       @relation(fields: [memberId], references: [id])
+  guestPhone      String?
+  startTime       DateTime
+  endTime         DateTime
+  durationHrs     Float
+  status          BookingStatus @default(WAITING)
+  basePrice       Int
+  discountApplied Float         @default(0)
+  finalPrice      Int
+  pointsEarned    Int           @default(0)
+  paid            Boolean       @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

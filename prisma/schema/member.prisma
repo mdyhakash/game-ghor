@@ -1,0 +1,16 @@
+model Member {
+  id               String           @id @default(cuid())
+  phone            String           @unique
+  password         String
+  name             String
+  tier             Tier             @default(BRONZE)
+  membershipStatus MembershipStatus @default(PENDING)
+  points           Int              @default(0)
+  totalHours       Float            @default(0)
+  bookings         Booking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("members")
+}

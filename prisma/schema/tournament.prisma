@@ -1,0 +1,47 @@
+model Tournament {
+  id           String            @id @default(cuid())
+  name         String
+  gameTitle    String
+  maxPlayers   Int
+  entryFee     Int               @default(0)
+  prizePool    String
+  startDate    DateTime
+  description  String
+  status       TournamentStatus  @default(UPCOMING)
+  participants Participant[]
+  matches      Match[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("tournaments")
+}
+
+model Participant {
+  id           String     @id @default(cuid())
+  tournamentId String
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  name         String
+  phone        String?
+
+  createdAt DateTime @default(now())
+
+  @@map("participants")
+}
+
+model Match {
+  id             String      @id @default(cuid())
+  tournamentId   String
+  tournament     Tournament  @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  round          Int
+  matchIndex     Int
+  participantAId String?
+  participantBId String?
+  winnerId       String?
+  scoreA         Int?
+  scoreB         Int?
+  status         MatchStatus @default(PENDING)
+
+  @@unique([tournamentId, round, matchIndex])
+  @@map("matches")
+}

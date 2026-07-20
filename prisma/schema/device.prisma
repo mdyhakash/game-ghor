@@ -1,0 +1,13 @@
+model Device {
+  id           String       @id @default(cuid())
+  name         String
+  type         DeviceType
+  status       DeviceStatus @default(AVAILABLE)
+  pricePerHour Int
+  bookings     Booking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("devices")
+}
