@@ -1,0 +1,9 @@
+enum Role {
+  MEMBER
+  ADMIN
+}
+
+enum SlotStatus {
+  AVAILABLE
+  BOOKED
+}
