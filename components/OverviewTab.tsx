@@ -117,7 +117,7 @@ export default function OverviewTab({
                 onClick={() => setWalkInType(t)}
                 className={`flex-1 py-2 rounded-lg text-[12.5px] font-semibold border ${
                   walkInType === t
-                    ? "border-pink bg-[var(--pink-dim)] text-pink"
+                    ? "border-pink bg-(--pink-dim) text-pink"
                     : "border-line bg-bg-soft text-text-dim"
                 }`}
               >
@@ -139,7 +139,7 @@ export default function OverviewTab({
                 onClick={() => setWalkInDuration(h)}
                 className={`flex-1 py-2 rounded-lg text-[12.5px] font-semibold border ${
                   walkInDuration === h
-                    ? "border-pink bg-[var(--pink-dim)] text-pink"
+                    ? "border-pink bg-(--pink-dim) text-pink"
                     : "border-line bg-bg-soft text-text-dim"
                 }`}
               >
@@ -236,8 +236,8 @@ export default function OverviewTab({
           No bookings yet.
         </div>
       ) : (
-        <div className="overflow-x-auto -mx-[18px] md:mx-0 px-[18px] md:px-0">
-          <table className="w-full text-[13px] border-collapse min-w-[760px]">
+        <div className="overflow-x-auto -mx-4.5 md:mx-0 px-4.5 md:px-0">
+          <table className="w-full text-[13px] border-collapse min-w-190">
             <thead>
               <tr className="text-left text-text-dim text-[11px] uppercase tracking-wider">
                 <th className="py-2 pr-3">Token</th>
@@ -313,7 +313,7 @@ export default function OverviewTab({
                       ) : (
                         <button
                           onClick={() => handleMarkPaid(b.id)}
-                          className="text-[11px] font-semibold text-gold bg-[var(--gold-dim)] border border-gold px-2.5 py-1 rounded-full whitespace-nowrap"
+                          className="text-[11px] font-semibold text-gold bg-(--gold-dim) border border-gold px-2.5 py-1 rounded-full whitespace-nowrap"
                         >
                           Mark paid
                         </button>
