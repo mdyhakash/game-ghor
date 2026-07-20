@@ -27,11 +27,11 @@ function PlayerRow({
   return (
     <div
       className={`flex items-center gap-1.5 h-1/2 px-2.5 ${
-        isWinner ? "bg-[var(--lime-dim)]" : ""
+        isWinner ? "bg-(--lime-dim)" : ""
       }`}
     >
       <div
-        className={`w-[18px] h-[18px] rounded-full flex items-center justify-center text-[9px] font-bold shrink-0 ${
+        className={`w-4.5 h-4.5 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0 ${
           name
             ? isWinner
               ? "bg-lime text-black"
@@ -46,7 +46,7 @@ function PlayerRow({
           isWinner
             ? "font-bold text-lime"
             : isLoser
-              ? "text-text-dim line-through decoration-[var(--line)]"
+              ? "text-text-dim line-through decoration-line"
               : !name
                 ? "text-text-dim italic"
                 : "text-text"
@@ -102,15 +102,15 @@ export default function BracketMatch({
         {isReady && onRecordResult && (
           <button
             onClick={() => onRecordResult(match)}
-            className="absolute top-1 right-1.5 z-10 text-[9px] font-bold text-gold bg-[var(--gold-dim)] border border-gold px-1.5 py-0.5 rounded-full flex items-center gap-1"
+            className="absolute top-1 right-1.5 z-10 text-[9px] font-bold text-gold bg-(--gold-dim) border border-gold px-1.5 py-0.5 rounded-full flex items-center gap-1"
           >
-            <span className="w-[5px] h-[5px] rounded-full bg-gold pulse-dot" />
+            <span className="w-1.25 h-1.25 rounded-full bg-gold pulse-dot" />
             RECORD
           </button>
         )}
         {isReady && !onRecordResult && (
           <div className="absolute top-1.5 right-2 flex items-center gap-1 z-10">
-            <span className="w-[5px] h-[5px] rounded-full bg-gold pulse-dot" />
+            <span className="w-1.25 h-1.25 rounded-full bg-gold pulse-dot" />
             <span className="text-[9px] text-gold font-bold">READY</span>
           </div>
         )}
