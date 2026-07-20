@@ -4,10 +4,20 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import BottomNav from "@/components/BottomNav";
-import BracketView from "@/components/BracketView";
-import { getTournamentDetail } from "@/lib/store";
+import BracketView, {
+  type RoundView,
+} from "@/components/admin/bracket/BracketView";
+import { api } from "@/lib/api-client";
+import type {
+  TournamentModel,
+  ParticipantModel,
+} from "@/lib/generated/prisma/models";
 
-type Detail = NonNullable<ReturnType<typeof getTournamentDetail>>;
+type Detail = {
+  tournament: TournamentModel;
+  participants: ParticipantModel[];
+  rounds: RoundView[];
+};
 
 const STATUS_STYLE: Record<string, string> = {
   UPCOMING: "text-gold bg-[var(--gold-dim)] border-gold",
@@ -20,9 +30,10 @@ export default function TournamentDetailPage() {
   const [data, setData] = useState<Detail | null | undefined>(undefined);
 
   useEffect(() => {
-    queueMicrotask(() => {
-      setData(getTournamentDetail(params.id));
-    });
+    api
+      .get<Detail>(`/tournaments/${params.id}`)
+      .then((res) => setData(res.data))
+      .catch(() => setData(null));
   }, [params.id]);
 
   if (data === undefined) {

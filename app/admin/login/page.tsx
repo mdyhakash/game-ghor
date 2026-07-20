@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { adminLogin } from "@/lib/store";
+import { api, getErrorMessage } from "@/lib/api-client";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -10,29 +10,34 @@ export default function AdminLoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
-    const result = adminLogin(password);
-    setSubmitting(false);
-    if ("error" in result) {
-      setError(result.error);
-      return;
+    try {
+      await api.post("/admin/auth/login", { password });
+      router.push("/admin");
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setSubmitting(false);
     }
-    router.push("/admin");
   }
 
   return (
     <div className="pb-6 md:max-w-sm md:mx-auto md:mt-16">
       <div className="px-4.5 md:px-0 pt-6">
         <div className="font-display text-lg font-bold">Admin login</div>
-        <div className="text-xs text-text-dim mt-1">Staff only — manage devices and bookings.</div>
+        <div className="text-xs text-text-dim mt-1">
+          Staff only — manage devices and bookings.
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="px-4.5 md:px-0 pt-4">
         <div className="mb-3.5">
-          <label className="text-xs font-semibold text-text-dim mb-1.5 block">Admin password</label>
+          <label className="text-xs font-semibold text-text-dim mb-1.5 block">
+            Admin password
+          </label>
           <input
             type="password"
             placeholder="••••••••"
@@ -52,7 +57,9 @@ export default function AdminLoginPage() {
           type="submit"
           disabled={submitting}
           className="w-full py-4 rounded-2xl font-display font-bold text-[14.5px] tracking-wide text-white"
-          style={{ background: "linear-gradient(90deg, var(--pink), var(--purple))" }}
+          style={{
+            background: "linear-gradient(90deg, var(--pink), var(--purple))",
+          }}
         >
           {submitting ? "Checking…" : "Log in"}
         </button>

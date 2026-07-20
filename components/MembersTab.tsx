@@ -1,8 +1,21 @@
-import { useState } from "react";
-import { getMemberDetail, approveMembership } from "@/lib/store";
+import { useEffect, useState } from "react";
+import { api } from "@/lib/api-client";
 import type { Members } from "@/hooks/useAdminData";
+import type {
+  MemberModel,
+  BookingModel,
+  DeviceModel,
+} from "@/lib/generated/prisma/models";
 import DetailStat from "./DetailStat";
 import { formatDate } from "@/lib/format";
+
+type MemberDetail = {
+  member: MemberModel;
+  bookings: (BookingModel & { device: DeviceModel | null })[];
+  visitCount: number;
+  lastVisit: string | null;
+  visitsLast30Days: number;
+};
 
 interface MembersTabProps {
   members: Members;
@@ -12,8 +25,17 @@ interface MembersTabProps {
 export default function MembersTab({ members, refresh }: MembersTabProps) {
   const [memberSearch, setMemberSearch] = useState("");
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
+  const [memberDetail, setMemberDetail] = useState<MemberDetail | null>(null);
 
-  const memberDetail = selectedMemberId ? getMemberDetail(selectedMemberId) : null;
+  useEffect(() => {
+    if (!selectedMemberId) {
+      setMemberDetail(null);
+      return;
+    }
+    api
+      .get<MemberDetail>(`/admin/members/${selectedMemberId}`)
+      .then((res) => setMemberDetail(res.data));
+  }, [selectedMemberId]);
 
   function openMember(id: string) {
     setSelectedMemberId(id);
@@ -23,15 +45,20 @@ export default function MembersTab({ members, refresh }: MembersTabProps) {
     setSelectedMemberId(null);
   }
 
-  function handleApprove(id: string) {
-    approveMembership(id);
+  async function handleApprove(id: string) {
+    await api.post(`/admin/members/${id}/approve`);
     refresh();
+    // refresh the open modal's data too
+    const res = await api.get<MemberDetail>(`/admin/members/${id}`);
+    setMemberDetail(res.data);
   }
 
   const filteredMembers = members.filter((m) =>
     m.phone.includes(memberSearch.trim()),
   );
 
+  // ... the rest of your JSX (search input, table, modal) stays exactly
+  // the same — it already reads from `filteredMembers` and `memberDetail`.
   return (
     <>
       {/* members tab search */}

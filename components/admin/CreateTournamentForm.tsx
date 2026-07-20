@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { createTournament } from "@/lib/store";
+import { api, getErrorMessage } from "@/lib/api-client";
+import type { TournamentModel } from "@/lib/generated/prisma/models";
 
 const MAX_PLAYERS_OPTIONS = [4, 8, 16, 32];
 
@@ -19,30 +20,33 @@ export default function CreateTournamentForm({
   const [description, setDescription] = useState("");
   const [createError, setCreateError] = useState<string | null>(null);
 
-  function handleCreate(e: React.FormEvent) {
+  async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
     setCreateError(null);
-    const result = createTournament({
-      name,
-      gameTitle,
-      maxPlayers,
-      entryFee,
-      prizePool,
-      startDate,
-      description,
-    });
-    if ("error" in result) {
-      setCreateError(result.error);
-      return;
+    try {
+      const res = await api.post<{ tournament: TournamentModel }>(
+        "/admin/tournaments",
+        {
+          name,
+          gameTitle,
+          maxPlayers,
+          entryFee,
+          prizePool,
+          startDate,
+          description,
+        },
+      );
+      setName("");
+      setGameTitle("");
+      setMaxPlayers(8);
+      setEntryFee(0);
+      setPrizePool("");
+      setStartDate("");
+      setDescription("");
+      onSuccess(res.data.tournament.id);
+    } catch (err) {
+      setCreateError(getErrorMessage(err));
     }
-    setName("");
-    setGameTitle("");
-    setMaxPlayers(8);
-    setEntryFee(0);
-    setPrizePool("");
-    setStartDate("");
-    setDescription("");
-    onSuccess(result.tournament.id);
   }
 
   return (

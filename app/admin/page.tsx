@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { isAdminLoggedIn, adminLogout } from "@/lib/store";
+import { api } from "@/lib/api-client";
 import { useAdminData } from "@/hooks/useAdminData";
 import OverviewTab from "@/components/OverviewTab";
 import MembersTab from "@/components/MembersTab";
@@ -19,19 +19,22 @@ export default function AdminDashboardPage() {
   const { devices, bookings, stats, members, now, refresh } = useAdminData();
 
   useEffect(() => {
-    if (!isAdminLoggedIn()) {
-      router.replace("/admin/login");
-      return;
-    }
-    queueMicrotask(() => {
-      setChecked(true);
-      refresh();
-    });
+    api
+      .get<{ isAdmin: boolean }>("/admin/auth/me")
+      .then((res) => {
+        if (!res.data.isAdmin) {
+          router.replace("/admin/login");
+          return;
+        }
+        setChecked(true);
+        refresh();
+      })
+      .catch(() => router.replace("/admin/login"));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
-  function handleLogout() {
-    adminLogout();
+  async function handleLogout() {
+    await api.post("/admin/auth/logout");
     router.push("/admin/login");
   }
 
@@ -64,7 +67,6 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* tabs */}
       <div className="flex gap-2 pb-5">
         {(["overview", "members", "tournaments"] as const).map((t) => (
           <button
@@ -90,9 +92,7 @@ export default function AdminDashboardPage() {
           refresh={refresh}
         />
       )}
-
       {tab === "members" && <MembersTab members={members} refresh={refresh} />}
-
       {tab === "tournaments" && <TournamentsTab />}
     </div>
   );

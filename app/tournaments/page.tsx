@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import BottomNav from "@/components/BottomNav";
-import { getTournaments } from "@/lib/store";
+import { api } from "@/lib/api-client";
+import type { TournamentModel } from "@/lib/generated/prisma/models";
 
-type Tournaments = ReturnType<typeof getTournaments>;
+type Tournaments = (TournamentModel & { participantCount: number })[];
 
 const STATUS_STYLE: Record<string, string> = {
   UPCOMING: "text-gold bg-[var(--gold-dim)] border-gold",
@@ -18,10 +19,10 @@ export default function TournamentsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    queueMicrotask(() => {
-      setTournaments(getTournaments());
-      setLoading(false);
-    });
+    api
+      .get<Tournaments>("/tournaments")
+      .then((res) => setTournaments(res.data))
+      .finally(() => setLoading(false));
   }, []);
 
   return (

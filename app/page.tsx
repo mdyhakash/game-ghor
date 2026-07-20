@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import BottomNav from "@/components/BottomNav";
 import GameIcon from "@/components/GameIcon";
 import { DEVICE_META, CAFE_PHONE, CAFE_PHONE_DISPLAY } from "@/lib/data";
-import { getDevices, getCurrentMemberView, logout } from "@/lib/store";
+import { api } from "@/lib/api-client";
+import type { DeviceView, MemberView } from "@/lib/types";
 import {
   RiUserLine,
   RiTrophyLine,
@@ -18,25 +19,26 @@ import GamesAvailable from "@/components/GamesAvailable";
 import { RiPhoneLine } from "react-icons/ri";
 import Footer from "@/components/Footer";
 
-type Device = ReturnType<typeof getDevices>[number];
-type Member = ReturnType<typeof getCurrentMemberView>;
-
 export default function HomePage() {
   const router = useRouter();
-  const [devices, setDevices] = useState<Device[]>([]);
-  const [member, setMember] = useState<Member>(null);
+  const [devices, setDevices] = useState<DeviceView[]>([]);
+  const [member, setMember] = useState<MemberView | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    queueMicrotask(() => {
-      setDevices(getDevices());
-      setMember(getCurrentMemberView());
-      setLoading(false);
-    });
+    Promise.all([
+      api.get<DeviceView[]>("/devices"),
+      api.get<{ member: MemberView | null }>("/auth/me"),
+    ])
+      .then(([devicesRes, meRes]) => {
+        setDevices(devicesRes.data);
+        setMember(meRes.data.member);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  function handleLogout() {
-    logout();
+  async function handleLogout() {
+    await api.post("/auth/logout");
     setMember(null);
   }
 

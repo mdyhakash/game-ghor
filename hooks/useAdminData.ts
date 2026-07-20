@@ -1,16 +1,32 @@
-import { useState, useEffect } from "react";
-import {
-  getAdminDevices,
-  getAllBookings,
-  getAdminStats,
-  getAllMembers,
-  updateBookingStatus,
-} from "@/lib/store";
+import { useState, useEffect, useCallback } from "react";
+import { api } from "@/lib/api-client";
+import type { DeviceView } from "@/lib/types";
+import type { BookingModel, DeviceModel } from "@/lib/generated/prisma/models";
 
-type Devices = ReturnType<typeof getAdminDevices>;
-type Bookings = ReturnType<typeof getAllBookings>;
-type Stats = ReturnType<typeof getAdminStats>;
-type Members = ReturnType<typeof getAllMembers>;
+type BookingRow = BookingModel & {
+  device: DeviceModel | null;
+  customerLabel: string;
+};
+
+export type Devices = DeviceView[];
+export type Bookings = BookingRow[];
+export type Stats = {
+  devicesFree: number;
+  devicesTotal: number;
+  bookingsToday: number;
+  revenueToday: number;
+  totalMembers: number;
+};
+export type MemberRow = {
+  id: string;
+  name: string;
+  phone: string;
+  points: number;
+  membershipStatus: string;
+  createdAt: string;
+  visitCount: number;
+};
+export type Members = MemberRow[];
 
 export function useAdminData() {
   const [devices, setDevices] = useState<Devices>([]);
@@ -19,39 +35,37 @@ export function useAdminData() {
   const [members, setMembers] = useState<Members>([]);
   const [now, setNow] = useState(() => Date.now());
 
-  function refresh() {
-    setDevices(getAdminDevices());
-    setBookings(getAllBookings());
-    setStats(getAdminStats());
-    setMembers(getAllMembers());
-  }
-
-  // Ticks every second so ACTIVE sessions' countdowns stay live, and
-  // auto-completes any session whose timer has run out.
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const current = getAllBookings();
-      const expired = current.filter(
-        (b) =>
-          b.status === "ACTIVE" && new Date(b.endTime).getTime() <= Date.now(),
-      );
-      if (expired.length > 0) {
-        expired.forEach((b) => updateBookingStatus(b.id, "COMPLETED"));
-        refresh();
-      } else {
-        setNow(Date.now());
-      }
-    }, 1000);
-    return () => clearInterval(interval);
+  const refresh = useCallback(() => {
+    api.get<Devices>("/devices").then((res) => setDevices(res.data));
+    api.get<Bookings>("/admin/bookings").then((res) => setBookings(res.data));
+    api.get<Stats>("/admin/stats").then((res) => setStats(res.data));
+    api.get<Members>("/admin/members").then((res) => setMembers(res.data));
   }, []);
 
-  return {
-    devices,
-    bookings,
-    stats,
-    members,
-    now,
-    refresh,
-  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      api.get<Bookings>("/admin/bookings").then((res) => {
+        const current = res.data;
+        const expired = current.filter(
+          (b) =>
+            b.status === "ACTIVE" &&
+            new Date(b.endTime).getTime() <= Date.now(),
+        );
+        if (expired.length > 0) {
+          Promise.all(
+            expired.map((b) =>
+              api.patch(`/admin/bookings/${b.id}/status`, {
+                status: "COMPLETED",
+              }),
+            ),
+          ).then(refresh);
+        } else {
+          setNow(Date.now());
+        }
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [refresh]);
+
+  return { devices, bookings, stats, members, now, refresh };
 }
-export type { Devices, Bookings, Stats, Members };

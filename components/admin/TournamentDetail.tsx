@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { generateFixture } from "@/lib/store";
-import BracketView, { type MatchView } from "@/components/admin/bracket/BracketView";
-import type { getTournamentDetail } from "@/lib/store";
+import { api, getErrorMessage } from "@/lib/api-client";
+import BracketView, {
+  type MatchView,
+} from "@/components/admin/bracket/BracketView";
 import ParticipantForm from "./ParticipantForm";
 
 type Detail = NonNullable<ReturnType<typeof getTournamentDetail>>;
@@ -25,14 +26,14 @@ export default function TournamentDetail({
 }: TournamentDetailProps) {
   const [fixtureError, setFixtureError] = useState<string | null>(null);
 
-  function handleGenerateFixture() {
+  async function handleGenerateFixture() {
     setFixtureError(null);
-    const result = generateFixture(detail.tournament.id);
-    if ("error" in result) {
-      setFixtureError(result.error);
-      return;
+    try {
+      await api.post(`/admin/tournaments/${detail.tournament.id}/generate`);
+      onRefresh();
+    } catch (err) {
+      setFixtureError(getErrorMessage(err));
     }
-    onRefresh();
   }
 
   return (

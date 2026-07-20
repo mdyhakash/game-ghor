@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { login } from "@/lib/store";
+import { api, getErrorMessage } from "@/lib/api-client";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,38 +12,48 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
-    const result = login(phone, password);
-    setSubmitting(false);
-    if ("error" in result) {
-      setError(result.error);
-      return;
+
+    try {
+      await api.post("/auth/login", {
+        phone,
+        password,
+      });
+
+      router.push("/");
+      router.refresh();
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setSubmitting(false);
     }
-    router.push("/");
-    router.refresh();
   }
 
   return (
     <div className="pb-6 md:max-w-md md:mx-auto md:mt-6">
-      <div className="flex items-center gap-2.5 px-[18px] md:px-0 pt-4 pb-1.5">
+      <div className="flex items-center gap-2.5 px-4.5 md:px-0 pt-4 pb-1.5">
         <Link
           href="/"
-          className="w-[34px] h-[34px] rounded-[10px] bg-card border border-line flex items-center justify-center text-base"
+          className="w-8.5 h-8.5 rounded-[10px] bg-card border border-line flex items-center justify-center text-base"
         >
           ←
         </Link>
         <div>
           <div className="font-display text-lg font-bold">Member login</div>
-          <div className="text-xs text-text-dim">Log in to get your tier discount</div>
+          <div className="text-xs text-text-dim">
+            Log in to get your tier discount
+          </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="px-[18px] md:px-0 pt-4">
+      <form onSubmit={handleSubmit} className="px-4.5 md:px-0 pt-4">
         <div className="mb-3.5">
-          <label className="text-xs font-semibold text-text-dim mb-1.5 block">Phone number</label>
+          <label className="text-xs font-semibold text-text-dim mb-1.5 block">
+            Phone number
+          </label>
           <input
             type="tel"
             placeholder="01XXXXXXXXX"
@@ -53,7 +63,9 @@ export default function LoginPage() {
           />
         </div>
         <div className="mb-3.5">
-          <label className="text-xs font-semibold text-text-dim mb-1.5 block">Password</label>
+          <label className="text-xs font-semibold text-text-dim mb-1.5 block">
+            Password
+          </label>
           <input
             type="password"
             placeholder="••••••••"
@@ -73,7 +85,9 @@ export default function LoginPage() {
           type="submit"
           disabled={submitting}
           className="w-full py-4 rounded-2xl font-display font-bold text-[14.5px] tracking-wide text-white"
-          style={{ background: "linear-gradient(90deg, var(--pink), var(--purple))" }}
+          style={{
+            background: "linear-gradient(90deg, var(--pink), var(--purple))",
+          }}
         >
           {submitting ? "Logging in…" : "Log in"}
         </button>

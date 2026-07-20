@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signup } from "@/lib/store";
+import { api, getErrorMessage } from "@/lib/api-client";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -13,42 +13,53 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
-    const result = signup(name, phone, password);
-    setSubmitting(false);
-    if ("error" in result) {
-      setError(result.error);
-      return;
+
+    try {
+      await api.post("/auth/signup", {
+        name,
+        phone,
+        password,
+      });
+
+      router.push("/");
+      router.refresh();
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setSubmitting(false);
     }
-    router.push("/");
-    router.refresh();
   }
 
   return (
     <div className="pb-6 md:max-w-md md:mx-auto md:mt-6">
-      <div className="flex items-center gap-2.5 px-[18px] md:px-0 pt-4 pb-1.5">
+      <div className="flex items-center gap-2.5 px-4.5 md:px-0 pt-4 pb-1.5">
         <Link
           href="/login"
-          className="w-[34px] h-[34px] rounded-[10px] bg-card border border-line flex items-center justify-center text-base"
+          className="w-8.5 h-8.5 rounded-[10px] bg-card border border-line flex items-center justify-center text-base"
         >
           ←
         </Link>
         <div>
           <div className="font-display text-lg font-bold">Join membership</div>
-          <div className="text-xs text-text-dim">Takes 20 seconds, no card needed</div>
+          <div className="text-xs text-text-dim">
+            Takes 20 seconds, no card needed
+          </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="px-[18px] md:px-0 pt-4">
-        <div className="mb-3.5 flex items-center gap-2.5 bg-[var(--gold-dim)] border border-gold rounded-xl px-3.5 py-3 text-[12.5px] text-gold">
+      <form onSubmit={handleSubmit} className="px-4.5 md:px-0 pt-4">
+        <div className="mb-3.5 flex items-center gap-2.5 bg-(--gold-dim) border border-gold rounded-xl px-3.5 py-3 text-[12.5px] text-gold">
           🎁 Sign up today and your first hour is free
         </div>
 
         <div className="mb-3.5">
-          <label className="text-xs font-semibold text-text-dim mb-1.5 block">Your name</label>
+          <label className="text-xs font-semibold text-text-dim mb-1.5 block">
+            Your name
+          </label>
           <input
             type="text"
             placeholder="e.g. Nafis Ahmed"
@@ -58,7 +69,9 @@ export default function SignupPage() {
           />
         </div>
         <div className="mb-3.5">
-          <label className="text-xs font-semibold text-text-dim mb-1.5 block">Phone number</label>
+          <label className="text-xs font-semibold text-text-dim mb-1.5 block">
+            Phone number
+          </label>
           <input
             type="tel"
             placeholder="01XXXXXXXXX"
@@ -68,7 +81,9 @@ export default function SignupPage() {
           />
         </div>
         <div className="mb-3.5">
-          <label className="text-xs font-semibold text-text-dim mb-1.5 block">Create a password</label>
+          <label className="text-xs font-semibold text-text-dim mb-1.5 block">
+            Create a password
+          </label>
           <input
             type="password"
             placeholder="••••••••"
@@ -88,7 +103,9 @@ export default function SignupPage() {
           type="submit"
           disabled={submitting}
           className="w-full py-4 rounded-2xl font-display font-bold text-[14.5px] tracking-wide text-white"
-          style={{ background: "linear-gradient(90deg, var(--pink), var(--purple))" }}
+          style={{
+            background: "linear-gradient(90deg, var(--pink), var(--purple))",
+          }}
         >
           {submitting ? "Creating…" : "Create membership"}
         </button>

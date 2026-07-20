@@ -336,3 +336,12 @@ export function generateTokenCandidate() {
   const n = Math.floor(Math.random() * 900 + 10); // 010-909
   return n.toString().padStart(3, "0");
 }
+/** Fisher–Yates shuffle — used for the random tournament draw. */
+export function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}

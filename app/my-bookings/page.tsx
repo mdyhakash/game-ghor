@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from "react";
 import BottomNav from "@/components/BottomNav";
-import { getCurrentMember, getMyBookings } from "@/lib/store";
+import { api } from "@/lib/api-client";
+import type { BookingModel, DeviceModel } from "@/lib/generated/prisma/models";
 import { RiGamepadLine } from "react-icons/ri";
 
-type Bookings = NonNullable<ReturnType<typeof getMyBookings>>;
+type Bookings = (BookingModel & {
+  device: DeviceModel | null;
+})[];
 
 export default function MyBookingsPage() {
   const [loading, setLoading] = useState(true);
@@ -13,18 +16,27 @@ export default function MyBookingsPage() {
   const [bookings, setBookings] = useState<Bookings>([]);
 
   useEffect(() => {
-    queueMicrotask(() => {
-      const member = getCurrentMember();
-      setLoggedIn(!!member);
-      setBookings(getMyBookings() ?? []);
-      setLoading(false);
-    });
+    api
+      .get<Bookings>("/bookings/mine")
+      .then((res) => {
+        setLoggedIn(true);
+        setBookings(res.data);
+      })
+      .catch(() => {
+        setLoggedIn(false);
+        setBookings([]);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   if (loading) {
     return (
       <div className="pb-6 md:max-w-2xl md:mx-auto">
-        <div className="px-[18px] md:px-0 pt-[18px] pb-2.5 font-display text-xl">My Bookings</div>
+        <div className="px-4.5 md:px-0 pt-4.5 pb-2.5 font-display text-xl">
+          My Bookings
+        </div>
         <BottomNav />
       </div>
     );
@@ -33,7 +45,9 @@ export default function MyBookingsPage() {
   if (!loggedIn) {
     return (
       <div className="pb-6 md:max-w-2xl md:mx-auto">
-        <div className="px-[18px] md:px-0 pt-[18px] pb-2.5 font-display text-xl">My Bookings</div>
+        <div className="px-4.5 md:px-0 pt-4.5 pb-2.5 font-display text-xl">
+          My Bookings
+        </div>
         <div className="text-center px-8 py-16 text-text-dim text-[13.5px]">
           Log in as a member to see your booking history.
           <br />
@@ -46,7 +60,9 @@ export default function MyBookingsPage() {
 
   return (
     <div className="pb-6 md:max-w-2xl md:mx-auto">
-      <div className="px-[18px] md:px-0 pt-[18px] pb-2.5 font-display text-xl">My Bookings</div>
+      <div className="px-4.5 md:px-0 pt-4.5 pb-2.5 font-display text-xl">
+        My Bookings
+      </div>
 
       {bookings.length === 0 ? (
         <div className="text-center px-8 py-16 text-text-dim text-[13.5px]">
@@ -55,23 +71,33 @@ export default function MyBookingsPage() {
           Go book a slot <RiGamepadLine size={14} className="inline-block" />
         </div>
       ) : (
-        <div className="px-[18px] md:px-0 grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="px-4.5 md:px-0 grid grid-cols-1 md:grid-cols-2 gap-3">
           {bookings.map((b) => {
-            const startLabel = new Date(b.startTime).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-            const endLabel = new Date(b.endTime).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+            const startLabel = new Date(b.startTime).toLocaleTimeString(
+              "en-US",
+              { hour: "numeric", minute: "2-digit" },
+            );
+            const endLabel = new Date(b.endTime).toLocaleTimeString("en-US", {
+              hour: "numeric",
+              minute: "2-digit",
+            });
             return (
               <div
                 key={b.id}
                 className="flex justify-between items-center bg-card border border-line rounded-2xl px-4 py-3.5"
               >
                 <div>
-                  <div className="font-bold text-sm">{b.device?.name ?? "Device"}</div>
+                  <div className="font-bold text-sm">
+                    {b.device?.name ?? "Device"}
+                  </div>
                   <div className="text-xs text-text-dim mt-0.5">
                     {startLabel} – {endLabel} · {b.durationHrs}h
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-display font-bold text-xl text-lime">#{b.token}</div>
+                  <div className="font-display font-bold text-xl text-lime">
+                    #{b.token}
+                  </div>
                   <div
                     className={`text-[10.5px] mt-0.5 ${
                       b.status === "COMPLETED" ? "text-text-dim" : "text-lime"

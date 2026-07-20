@@ -1,57 +1,67 @@
-import { useEffect, useState } from "react";
-import { getTournaments, getTournamentDetail, recordMatchResult } from "@/lib/store";
+import { useEffect, useState, useCallback } from "react";
+import { api } from "@/lib/api-client";
+import type { TournamentModel } from "@/lib/generated/prisma/models";
 import type { MatchView } from "@/components/admin/bracket/BracketView";
 import TournamentList from "./TournamentList";
 import CreateTournamentForm from "./CreateTournamentForm";
 import TournamentDetail from "./TournamentDetail";
 import RecordResultModal from "./RecordResultModal";
 
-type Tournaments = ReturnType<typeof getTournaments>;
-type Detail = NonNullable<ReturnType<typeof getTournamentDetail>>;
+type Tournaments = (TournamentModel & { participantCount: number })[];
+type Detail = {
+  tournament: TournamentModel;
+  participants: {
+    id: string;
+    tournamentId: string;
+    name: string;
+    phone: string | null;
+  }[];
+  rounds: { round: number; matches: MatchView[] }[];
+};
 
 export default function TournamentsTab() {
   const [tournaments, setTournaments] = useState<Tournaments>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<Detail | null>(null);
-
-  // create form toggle
   const [showCreate, setShowCreate] = useState(false);
-
-  // record result modal state
   const [resultMatch, setResultMatch] = useState<MatchView | null>(null);
 
-  function refresh() {
-    setTournaments(getTournaments());
+  const refresh = useCallback(() => {
+    api
+      .get<Tournaments>("/tournaments")
+      .then((res) => setTournaments(res.data));
     if (selectedId) {
-      setDetail(getTournamentDetail(selectedId));
+      api
+        .get<Detail>(`/tournaments/${selectedId}`)
+        .then((res) => setDetail(res.data));
     }
-  }
+  }, [selectedId]);
 
   useEffect(() => {
-    queueMicrotask(() => {
-      refresh();
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedId]);
+    refresh();
+  }, [refresh]);
 
   function handleCreateSuccess(newId: string) {
     setShowCreate(false);
     setSelectedId(newId);
-    setTournaments(getTournaments());
+    api
+      .get<Tournaments>("/tournaments")
+      .then((res) => setTournaments(res.data));
   }
 
-  function handleRecordResultSubmit(
+  async function handleRecordResultSubmit(
     winnerId: string,
     scoreA?: number,
     scoreB?: number,
   ) {
     if (!selectedId || !resultMatch) return;
-    recordMatchResult(
-      selectedId,
-      resultMatch.id,
-      winnerId,
-      scoreA,
-      scoreB,
+    await api.post(
+      `/admin/tournaments/${selectedId}/matches/${resultMatch.id}/result`,
+      {
+        winnerId,
+        scoreA,
+        scoreB,
+      },
     );
     setResultMatch(null);
     refresh();

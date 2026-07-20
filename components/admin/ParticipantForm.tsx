@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { addParticipant, removeParticipant } from "@/lib/store";
+import { api, getErrorMessage } from "@/lib/api-client";
 import type { Participant } from "@/lib/data";
 
 interface ParticipantFormProps {
@@ -19,23 +19,30 @@ export default function ParticipantForm({
   const [playerPhone, setPlayerPhone] = useState("");
   const [playerError, setPlayerError] = useState<string | null>(null);
 
-  function handleAddPlayer(e: React.FormEvent) {
+  async function handleAddPlayer(e: React.FormEvent) {
     e.preventDefault();
     setPlayerError(null);
-    const result = addParticipant(tournamentId, playerName, playerPhone);
-    if ("error" in result) {
-      setPlayerError(result.error);
-      return;
+    try {
+      await api.post(`/admin/tournaments/${tournamentId}/participents`, {
+        name: playerName,
+        phone: playerPhone,
+      });
+      setPlayerName("");
+      setPlayerPhone("");
+      onRefresh();
+    } catch (err) {
+      setPlayerError(getErrorMessage(err));
     }
-    setPlayerName("");
-    setPlayerPhone("");
+  }
+
+  async function handleRemovePlayer(participantId: string) {
+    await api.delete(
+      `/admin/tournaments/${tournamentId}/participents/${participantId}`,
+    );
     onRefresh();
   }
 
-  function handleRemovePlayer(participantId: string) {
-    removeParticipant(tournamentId, participantId);
-    onRefresh();
-  }
+  // ...rest of your JSX is unchanged.
 
   return (
     <div>

@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getCurrentMemberView, logout } from "@/lib/store";
+import { api } from "@/lib/api-client";
+import type { MemberView } from "@/lib/types";
 import { RiUserLine, RiLogoutBoxLine } from "react-icons/ri";
 import GameIcon from "@/components/GameIcon";
 
@@ -14,21 +15,27 @@ const items = [
   { href: "/tournaments", label: "Tournaments" },
 ];
 
-type Member = ReturnType<typeof getCurrentMemberView>;
-
 export default function Header() {
   const pathname = usePathname();
-  const [member, setMember] = useState<Member>(null);
+  const [member, setMember] = useState<MemberView | null>(null);
 
   useEffect(() => {
-    queueMicrotask(() => {
-      setMember(getCurrentMemberView());
-    });
+    api
+      .get<{ member: MemberView | null }>("/auth/me")
+      .then((res) => {
+        setMember(res.data.member);
+      })
+      .catch(() => {
+        setMember(null);
+      });
   }, [pathname]);
 
-  function handleLogout() {
-    logout();
-    setMember(null);
+  async function handleLogout() {
+    try {
+      await api.post("/auth/logout");
+    } finally {
+      setMember(null);
+    }
   }
 
   return (
@@ -42,17 +49,21 @@ export default function Header() {
             <span className="w-2.5 h-2.5 rounded-sm bg-lime shadow-[0_0_10px_var(--lime)] pulse-dot" />
             Game Ghor
           </Link>
+
           <nav className="flex items-center gap-6">
             {items.map((item) => {
               const active =
                 item.href === "/"
                   ? pathname === "/"
                   : pathname.startsWith(item.href);
+
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`text-[13.5px] font-semibold ${active ? "text-pink" : "text-text-dim hover:text-text"}`}
+                  className={`text-[13.5px] font-semibold ${
+                    active ? "text-pink" : "text-text-dim hover:text-text"
+                  }`}
                 >
                   {item.label}
                 </Link>
@@ -69,8 +80,8 @@ export default function Header() {
             >
               <GameIcon iconKey={member.tierInfo.iconKey} size={14} />{" "}
               {member.name.split(" ")[0]}
-              <RiLogoutBoxLine size={13} className="ml-1 inline-block" />
-              {" "}Log out
+              <RiLogoutBoxLine size={13} className="ml-1 inline-block" /> Log
+              out
             </button>
           ) : (
             <Link

@@ -5,16 +5,19 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
 import { TYPE_LABEL, type DeviceType } from "@/lib/data";
-import { getSlots, getCurrentMemberView, createBooking } from "@/lib/store";
+import { api, getErrorMessage } from "@/lib/api-client";
+import type { MemberView } from "@/lib/types";
 import { RiArrowLeftLine } from "react-icons/ri";
 
 type Slot = { startTime: string; label: string; available: boolean };
-type Member = ReturnType<typeof getCurrentMemberView>;
+type Member = MemberView | null;
 
 function BookPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const initialType = (searchParams.get("type") ?? "PC").toUpperCase() as DeviceType;
+  const initialType = (
+    searchParams.get("type") ?? "PC"
+  ).toUpperCase() as DeviceType;
 
   const [deviceType, setDeviceType] = useState<DeviceType>(initialType);
   const [duration, setDuration] = useState(1);
@@ -27,17 +30,29 @@ function BookPageInner() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    queueMicrotask(() => {
-      setMember(getCurrentMemberView());
-    });
+    api
+      .get<{ member: MemberView | null }>("/auth/me")
+      .then((res) => setMember(res.data.member));
   }, []);
 
   useEffect(() => {
-    queueMicrotask(() => {
-      const { slots, pricePerHour } = getSlots(deviceType);
-      setSlots(slots);
-      setPricePerHour(pricePerHour);
-    });
+    api
+      .get<{
+        pricePerHour: number;
+        deviceCount: number;
+        slots: Slot[];
+      }>("/devices/slots", {
+        params: {
+          type: deviceType,
+        },
+      })
+      .then((res) => {
+        setSlots(res.data.slots);
+        setPricePerHour(res.data.pricePerHour);
+      })
+      .catch((err) => {
+        setError(getErrorMessage(err));
+      });
   }, [deviceType]);
 
   function handleSelectType(t: DeviceType) {
@@ -51,30 +66,32 @@ function BookPageInner() {
   const basePrice = pricePerHour * duration;
   const finalPrice = Math.round(basePrice * (1 - discount));
 
-  function handleLock() {
+  async function handleLock() {
     if (!selectedSlot) return;
+
     if (!member && !/^01[0-9]{9}$/.test(phone)) {
       setError("Enter a valid 11-digit phone number");
       return;
     }
+
     setSubmitting(true);
     setError(null);
 
-    const result = createBooking({
-      deviceType,
-      startTime: selectedSlot,
-      durationHrs: duration,
-      guestPhone: member ? undefined : phone,
-    });
+    try {
+      const res = await api.post<{ booking: { id: string } }>("/bookings", {
+        deviceType,
+        startTime: selectedSlot,
+        durationHrs: duration,
+        guestPhone: member ? undefined : phone,
+      });
 
-    setSubmitting(false);
-    if ("error" in result) {
-      setError(result.error);
-      return;
+      router.push(`/token/${res.data.booking.id}`);
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setSubmitting(false);
     }
-    router.push(`/token/${result.booking.id}`);
   }
-
   return (
     <div className="pb-6 md:max-w-2xl md:mx-auto">
       <div className="flex items-center gap-2.5 px-[18px] md:px-0 pt-4 pb-1.5">
@@ -85,15 +102,17 @@ function BookPageInner() {
           <RiArrowLeftLine size={18} />
         </Link>
         <div>
-          <div className="font-display text-lg font-bold">{TYPE_LABEL[deviceType]}</div>
+          <div className="font-display text-lg font-bold">
+            {TYPE_LABEL[deviceType]}
+          </div>
           <div className="text-xs text-text-dim">
             {member
               ? isApprovedMember
                 ? `Booking as ${member.tierInfo.label}`
                 : "Booking as member · pending approval, no discount yet"
               : phone
-              ? `Booking as guest · ${phone}`
-              : "Booking as guest"}
+                ? `Booking as guest · ${phone}`
+                : "Booking as guest"}
           </div>
         </div>
       </div>
@@ -105,7 +124,9 @@ function BookPageInner() {
             key={t}
             onClick={() => handleSelectType(t)}
             className={`flex-1 py-2 rounded-xl text-[13px] font-semibold border ${
-              deviceType === t ? "border-pink bg-[var(--pink-dim)] text-pink" : "border-line bg-card text-text-dim"
+              deviceType === t
+                ? "border-pink bg-[var(--pink-dim)] text-pink"
+                : "border-line bg-card text-text-dim"
             }`}
           >
             {TYPE_LABEL[t]}
@@ -115,7 +136,9 @@ function BookPageInner() {
 
       {!member && (
         <div className="px-[18px] md:px-0 pt-4">
-          <label className="text-xs font-semibold text-text-dim mb-1.5 block">Phone number</label>
+          <label className="text-xs font-semibold text-text-dim mb-1.5 block">
+            Phone number
+          </label>
           <input
             type="tel"
             placeholder="01XXXXXXXXX"
@@ -138,7 +161,9 @@ function BookPageInner() {
             key={h}
             onClick={() => setDuration(h)}
             className={`flex-1 py-2.5 rounded-xl text-[13px] font-semibold border ${
-              duration === h ? "border-pink bg-[var(--pink-dim)] text-pink" : "border-line bg-card text-text-dim"
+              duration === h
+                ? "border-pink bg-[var(--pink-dim)] text-pink"
+                : "border-line bg-card text-text-dim"
             }`}
           >
             {h} hr{h > 1 ? "s" : ""}
@@ -161,13 +186,15 @@ function BookPageInner() {
                 !slot.available
                   ? "border-dashed border-taken text-taken line-through cursor-not-allowed"
                   : isSelected
-                  ? "border-lime bg-[var(--lime-dim)] text-lime"
-                  : "border-line bg-card text-text"
+                    ? "border-lime bg-[var(--lime-dim)] text-lime"
+                    : "border-line bg-card text-text"
               }`}
             >
               {slot.label}
               {!slot.available && (
-                <span className="absolute bottom-0.5 right-1 text-[8px] tracking-wide">taken</span>
+                <span className="absolute bottom-0.5 right-1 text-[8px] tracking-wide">
+                  taken
+                </span>
               )}
             </button>
           );
@@ -185,7 +212,9 @@ function BookPageInner() {
         <div className="mx-[18px] md:mx-0 mt-3 text-[13px] text-text-dim flex justify-between">
           <span>Estimated price</span>
           <span className="text-text font-semibold">
-            {discount > 0 ? `৳${finalPrice} (was ৳${basePrice})` : `৳${basePrice}`}
+            {discount > 0
+              ? `৳${finalPrice} (was ৳${basePrice})`
+              : `৳${basePrice}`}
           </span>
         </div>
       )}
@@ -203,15 +232,18 @@ function BookPageInner() {
           className="w-full py-4 rounded-2xl font-display font-bold text-[15px] tracking-wide text-white disabled:bg-card disabled:text-text-dim"
           style={
             selectedSlot && !submitting
-              ? { background: "linear-gradient(90deg, var(--pink), var(--purple))" }
+              ? {
+                  background:
+                    "linear-gradient(90deg, var(--pink), var(--purple))",
+                }
               : undefined
           }
         >
           {submitting
             ? "Locking in…"
             : selectedSlot
-            ? `Lock in this slot · ${duration} hr${duration > 1 ? "s" : ""}`
-            : "Pick a slot first"}
+              ? `Lock in this slot · ${duration} hr${duration > 1 ? "s" : ""}`
+              : "Pick a slot first"}
         </button>
       </div>
 
@@ -222,7 +254,9 @@ function BookPageInner() {
 
 export default function BookPage() {
   return (
-    <Suspense fallback={<div className="p-6 text-text-dim text-sm">Loading…</div>}>
+    <Suspense
+      fallback={<div className="p-6 text-text-dim text-sm">Loading…</div>}
+    >
       <BookPageInner />
     </Suspense>
   );

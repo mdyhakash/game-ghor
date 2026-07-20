@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  setDeviceStatus,
-  updateBookingStatus,
-  markBookingPaid,
-  createWalkInBooking,
-  getDeviceTypePrice,
-} from "@/lib/store";
+import { api, getErrorMessage } from "@/lib/api-client";
 import type { BookingStatus, DeviceStatus, DeviceType } from "@/lib/data";
 import type { Devices, Bookings, Stats } from "@/hooks/useAdminData";
 import StatCard from "./StatCard";
@@ -35,50 +29,75 @@ export default function OverviewTab({
   now,
   refresh,
 }: OverviewTabProps) {
-  // walk-in form state
   const [walkInType, setWalkInType] = useState<DeviceType>("PC");
   const [walkInDuration, setWalkInDuration] = useState(1);
   const [walkInPhone, setWalkInPhone] = useState("");
   const [walkInError, setWalkInError] = useState<string | null>(null);
   const [walkInSubmitting, setWalkInSubmitting] = useState(false);
+  const [newDeviceName, setNewDeviceName] = useState("");
+  const [newDeviceType, setNewDeviceType] = useState<DeviceType>("PC");
+  const [newDevicePrice, setNewDevicePrice] = useState(0);
+  const [newDeviceError, setNewDeviceError] = useState<string | null>(null);
+  const [newDeviceSubmitting, setNewDeviceSubmitting] = useState(false);
 
-  function handleToggleStatus(deviceId: string, current: DeviceStatus) {
-    setDeviceStatus(
-      deviceId,
-      current === "AVAILABLE" ? "MAINTENANCE" : "AVAILABLE",
-    );
+  async function handleToggleStatus(deviceId: string, current: DeviceStatus) {
+    await api.patch(`/admin/devices/${deviceId}/status`, {
+      status: current === "AVAILABLE" ? "MAINTENANCE" : "AVAILABLE",
+    });
     refresh();
   }
 
-  function handleBookingStatus(id: string, status: BookingStatus) {
-    updateBookingStatus(id, status);
+  async function handleAddDevice(e: React.FormEvent) {
+    e.preventDefault();
+    setNewDeviceSubmitting(true);
+    setNewDeviceError(null);
+    try {
+      await api.post("/admin/devices", {
+        name: newDeviceName,
+        type: newDeviceType,
+        pricePerHour: newDevicePrice,
+      });
+      setNewDeviceName("");
+      setNewDevicePrice(0);
+      refresh();
+    } catch (err) {
+      setNewDeviceError(getErrorMessage(err));
+    } finally {
+      setNewDeviceSubmitting(false);
+    }
+  }
+
+  async function handleBookingStatus(id: string, status: BookingStatus) {
+    await api.patch(`/admin/bookings/${id}/status`, { status });
     refresh();
   }
 
-  function handleMarkPaid(id: string) {
-    markBookingPaid(id);
+  async function handleMarkPaid(id: string) {
+    await api.post(`/admin/bookings/${id}/paid`);
     refresh();
   }
 
-  function handleWalkInSubmit(e: React.FormEvent) {
+  async function handleWalkInSubmit(e: React.FormEvent) {
     e.preventDefault();
     setWalkInSubmitting(true);
     setWalkInError(null);
-    const result = createWalkInBooking({
-      deviceType: walkInType,
-      durationHrs: walkInDuration,
-      guestPhone: walkInPhone,
-    });
-    setWalkInSubmitting(false);
-    if ("error" in result) {
-      setWalkInError(result.error);
-      return;
+    try {
+      await api.post("/admin/bookings", {
+        deviceType: walkInType,
+        durationHrs: walkInDuration,
+        guestPhone: walkInPhone,
+      });
+      setWalkInPhone("");
+      refresh();
+    } catch (err) {
+      setWalkInError(getErrorMessage(err));
+    } finally {
+      setWalkInSubmitting(false);
     }
-    setWalkInPhone("");
-    refresh();
   }
 
-  const walkInPrice = getDeviceTypePrice(walkInType) * walkInDuration;
+  const walkInDevice = devices.find((d) => d.type === walkInType);
+  const walkInPrice = (walkInDevice?.pricePerHour ?? 0) * walkInDuration;
 
   return (
     <>
@@ -183,6 +202,77 @@ export default function OverviewTab({
           {walkInError}
         </div>
       )}
+      <div className="pt-7 pb-2 text-[12px] tracking-wider text-text-dim uppercase font-semibold">
+        Devices
+      </div>
+
+      <form
+        onSubmit={handleAddDevice}
+        className="bg-card border border-line rounded-2xl p-4 flex flex-col md:flex-row md:items-end gap-3 mb-3"
+      >
+        <div className="flex-1">
+          <label className="text-[11px] font-semibold text-text-dim mb-1.5 block">
+            Device name
+          </label>
+          <input
+            value={newDeviceName}
+            onChange={(e) => setNewDeviceName(e.target.value)}
+            placeholder="e.g. PC-05"
+            className="w-full px-3 py-2 rounded-lg border border-line bg-bg-soft text-text text-[13px] focus:outline-none focus:border-pink"
+          />
+        </div>
+
+        <div className="flex-1">
+          <label className="text-[11px] font-semibold text-text-dim mb-1.5 block">
+            Type
+          </label>
+          <div className="flex gap-1.5">
+            {DEVICE_TYPES.map((t) => (
+              <button
+                type="button"
+                key={t}
+                onClick={() => setNewDeviceType(t)}
+                className={`flex-1 py-2 rounded-lg text-[12.5px] font-semibold border ${
+                  newDeviceType === t
+                    ? "border-pink bg-(--pink-dim) text-pink"
+                    : "border-line bg-bg-soft text-text-dim"
+                }`}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex-1">
+          <label className="text-[11px] font-semibold text-text-dim mb-1.5 block">
+            Price/hr (৳)
+          </label>
+          <input
+            type="number"
+            min={0}
+            value={newDevicePrice}
+            onChange={(e) => setNewDevicePrice(Number(e.target.value))}
+            className="w-full px-3 py-2 rounded-lg border border-line bg-bg-soft text-text text-[13px] focus:outline-none focus:border-pink"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={newDeviceSubmitting}
+          className="px-4 py-2.5 rounded-lg font-display font-bold text-[13px] tracking-wide text-white whitespace-nowrap"
+          style={{
+            background: "linear-gradient(90deg, var(--pink), var(--purple))",
+          }}
+        >
+          {newDeviceSubmitting ? "Adding…" : "Add device"}
+        </button>
+      </form>
+      {newDeviceError && (
+        <div className="mb-3 px-3.5 py-2.5 rounded-[10px] bg-[#ff2e9322] text-pink text-[12.5px] font-semibold">
+          {newDeviceError}
+        </div>
+      )}
 
       {/* devices */}
       <div className="pt-7 pb-2 text-[12px] tracking-wider text-text-dim uppercase font-semibold">
@@ -219,9 +309,7 @@ export default function OverviewTab({
               onClick={() => handleToggleStatus(d.id, d.status)}
               className="text-[11px] font-semibold text-text-dim bg-bg-soft border border-line px-2.5 py-1.5 rounded-full whitespace-nowrap"
             >
-              {d.status === "MAINTENANCE"
-                ? "Set available"
-                : "Set maintenance"}
+              {d.status === "MAINTENANCE" ? "Set available" : "Set maintenance"}
             </button>
           </div>
         ))}
