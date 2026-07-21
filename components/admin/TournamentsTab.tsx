@@ -1,15 +1,15 @@
 import { useEffect, useState, useCallback } from "react";
 import { api } from "@/lib/api-client";
-import type { TournamentModel } from "@/lib/generated/prisma/models";
 import type { MatchView } from "@/components/admin/bracket/BracketView";
+import type { Tournament } from "@/lib/data";
 import TournamentList from "./TournamentList";
 import CreateTournamentForm from "./CreateTournamentForm";
 import TournamentDetail from "./TournamentDetail";
 import RecordResultModal from "./RecordResultModal";
 
-type Tournaments = (TournamentModel & { participantCount: number })[];
+type Tournaments = (Tournament & { participantCount: number })[];
 type Detail = {
-  tournament: TournamentModel;
+  tournament: Tournament;
   participants: {
     id: string;
     tournamentId: string;

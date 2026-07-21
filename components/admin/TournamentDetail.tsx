@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { api, getErrorMessage } from "@/lib/api-client";
-import type { TournamentModel } from "@/lib/generated/prisma/models";
+import type { Tournament } from "@/lib/data";
 import BracketView, {
   type MatchView,
 } from "@/components/admin/bracket/BracketView";
@@ -8,7 +8,7 @@ import ParticipantForm from "./ParticipantForm";
 import { useToast } from "@/components/Toast";
 
 type Detail = {
-  tournament: TournamentModel;
+  tournament: Tournament;
   participants: {
     id: string;
     tournamentId: string;
