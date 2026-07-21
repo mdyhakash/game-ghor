@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { OPEN_HOUR, CLOSE_HOUR, type DeviceType } from "@/lib/data";
+import {
+  OPEN_HOUR,
+  CLOSE_HOUR,
+  type DeviceType,
+  DEVICE_META,
+} from "@/lib/data";
 
 export async function GET(req: NextRequest) {
   const type = req.nextUrl.searchParams.get("type") as DeviceType | null;
-  if (!type || !["PS3", "PS4", "PS5", "Mobile"].includes(type)) {
+  if (!type || !(type in DEVICE_META)) {
     return NextResponse.json({ error: "Invalid device type" }, { status: 400 });
   }
 

@@ -9,6 +9,17 @@ export type DeviceType =
   | "RACING"
   | "ARCADE"
   | "VR";
+
+export const ALL_DEVICE_TYPES: DeviceType[] = [
+  "PC",
+  "PS3",
+  "PS4",
+  "PS5",
+  "MOBILE",
+  "RACING",
+  "ARCADE",
+  "VR",
+];
 export type DeviceStatus = "AVAILABLE" | "MAINTENANCE";
 export type BookingStatus = "WAITING" | "ACTIVE" | "COMPLETED" | "CANCELLED";
 

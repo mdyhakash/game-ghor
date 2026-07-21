@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/require-admin";
-import type { DeviceType } from "@/lib/data";
+import { ALL_DEVICE_TYPES, type DeviceType } from "@/lib/data";
 
 export async function POST(req: NextRequest) {
   const denied = await requireAdmin();
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   if (!name) {
     return NextResponse.json({ error: "Enter a device name" }, { status: 400 });
   }
-  if (!["PC", "PS4", "PS5"].includes(type)) {
+  if (!ALL_DEVICE_TYPES.includes(type)) {
     return NextResponse.json({ error: "Invalid device type" }, { status: 400 });
   }
   if (!pricePerHour || pricePerHour <= 0) {

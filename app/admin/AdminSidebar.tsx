@@ -9,6 +9,7 @@ import {
   RiTicketLine,
   RiTeamLine,
   RiTrophyLine,
+  RiGamepadLine,
 } from "react-icons/ri";
 const NAV_ITEMS = [
   { href: "/admin", label: "Overview", icon: RiDashboardLine },
@@ -16,6 +17,7 @@ const NAV_ITEMS = [
   { href: "/admin/bookings", label: "Bookings", icon: RiTicketLine },
   { href: "/admin/members", label: "Members", icon: RiTeamLine },
   { href: "/admin/tournaments", label: "Tournaments", icon: RiTrophyLine },
+  { href: "/admin/games", label: "Games", icon: RiGamepadLine },
 ];
 
 export default function AdminSidebar() {

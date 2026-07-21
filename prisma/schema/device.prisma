@@ -5,8 +5,7 @@ model Device {
   status       DeviceStatus @default(AVAILABLE)
   pricePerHour Int
   bookings     Booking[]
-  games    GameDevice[]
-
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
