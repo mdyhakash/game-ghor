@@ -3,9 +3,9 @@ enum DeviceType {
   PS3
   PS4
   PS5
-  Mobile
-  Racing
-  Arcade
+  MOBILE
+  RACING
+  ARCADE
   VR
 }
 
@@ -42,4 +42,20 @@ enum TournamentStatus {
 enum MatchStatus {
   PENDING
   COMPLETED
+}
+
+enum GameGenre {
+  ACTION
+  ADVENTURE
+  RPG
+  SPORTS
+  RACING
+  FIGHTING
+  TACTICAL_FPS
+  FPS
+  BATTLE_ROYALE
+  OPEN_WORLD
+  HORROR
+  PUZZLE
+  SIMULATION
 }
