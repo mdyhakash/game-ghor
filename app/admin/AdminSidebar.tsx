@@ -3,13 +3,19 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { api } from "@/lib/api-client";
-
+import {
+  RiDashboardLine,
+  RiComputerLine,
+  RiTicketLine,
+  RiTeamLine,
+  RiTrophyLine,
+} from "react-icons/ri";
 const NAV_ITEMS = [
-  { href: "/admin", label: "Overview", icon: "📊" },
-  { href: "/admin/devices", label: "Devices", icon: "🖥️" },
-  { href: "/admin/bookings", label: "Bookings", icon: "🎟️" },
-  { href: "/admin/members", label: "Members", icon: "👥" },
-  { href: "/admin/tournaments", label: "Tournaments", icon: "🏆" },
+  { href: "/admin", label: "Overview", icon: RiDashboardLine },
+  { href: "/admin/devices", label: "Devices", icon: RiComputerLine },
+  { href: "/admin/bookings", label: "Bookings", icon: RiTicketLine },
+  { href: "/admin/members", label: "Members", icon: RiTeamLine },
+  { href: "/admin/tournaments", label: "Tournaments", icon: RiTrophyLine },
 ];
 
 export default function AdminSidebar() {
@@ -32,6 +38,7 @@ export default function AdminSidebar() {
 
         <nav className="flex flex-col gap-1 flex-1">
           {NAV_ITEMS.map((item) => {
+            const Icon = item.icon;
             const active =
               item.href === "/admin"
                 ? pathname === "/admin"
@@ -46,7 +53,7 @@ export default function AdminSidebar() {
                     : "text-text-dim hover:bg-bg-soft"
                 }`}
               >
-                <span>{item.icon}</span>
+                <Icon className="w-5 h-5 shrink-0" />
                 {item.label}
               </Link>
             );
@@ -70,36 +77,30 @@ export default function AdminSidebar() {
       </aside>
 
       {/* mobile: horizontal scroll strip up top */}
-      <div className="md:hidden sticky top-0 z-10 bg-card border-b border-line overflow-x-auto">
-        <div className="flex items-center gap-1 px-3 py-2 min-w-max">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-line">
+        <div className="grid grid-cols-5 h-16">
           {NAV_ITEMS.map((item) => {
+            const Icon = item.icon;
             const active =
               item.href === "/admin"
                 ? pathname === "/admin"
                 : pathname.startsWith(item.href);
+
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12.5px] font-semibold whitespace-nowrap ${
-                  active
-                    ? "bg-(--pink-dim) text-pink"
-                    : "text-text-dim bg-bg-soft"
+                className={`flex flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors ${
+                  active ? "text-pink" : "text-text-dim"
                 }`}
               >
-                <span>{item.icon}</span>
-                {item.label}
+                <Icon className="w-5 h-5" />
+                <span>{item.label}</span>
               </Link>
             );
           })}
-          <button
-            onClick={handleLogout}
-            className="px-3 py-1.5 rounded-full text-[12.5px] font-semibold text-text-dim bg-bg-soft whitespace-nowrap"
-          >
-            Log out
-          </button>
         </div>
-      </div>
+      </nav>
     </>
   );
 }
