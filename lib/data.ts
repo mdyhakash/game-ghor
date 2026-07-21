@@ -5,9 +5,9 @@ export type DeviceType =
   | "PS3"
   | "PS4"
   | "PS5"
-  | "Mobile"
-  | "Racing"
-  | "Arcade"
+  | "MOBILE"
+  | "RACING"
+  | "ARCADE"
   | "VR";
 export type DeviceStatus = "AVAILABLE" | "MAINTENANCE";
 export type BookingStatus = "WAITING" | "ACTIVE" | "COMPLETED" | "CANCELLED";
@@ -78,19 +78,19 @@ export const DEVICE_META: Record<
     sub: "FIFA, GTA, and more",
   },
 
-  Mobile: {
+  MOBILE: {
     iconKey: "MOBILE",
     title: "Mobile",
     sub: "eFootball, Free Fire, PUBG",
   },
 
-  Racing: {
+  RACING: {
     iconKey: "RACING",
     title: "Racing Simulator",
     sub: "Steering wheel & pedal setup",
   },
 
-  Arcade: {
+  ARCADE: {
     iconKey: "ARCADE",
     title: "Arcade Machine",
     sub: "Classic arcade games",
@@ -187,9 +187,9 @@ export const TYPE_LABEL: Record<DeviceType, string> = {
   PS3: "PS3",
   PS4: "PS4",
   PS5: "PS5",
-  Mobile: "Mobile",
-  Racing: "Racing",
-  Arcade: "Arcade",
+  MOBILE: "MOBILE",
+  RACING: "RACING",
+  ARCADE: "ARCADE",
   VR: "VR",
 };
 
