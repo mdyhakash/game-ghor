@@ -8,10 +8,15 @@ export function formatCountdown(ms: number) {
   return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
 }
 
-export function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-US", {
-    year: "numeric",
+export function formatDate(date: Date | string) {
+  const d = date instanceof Date ? date : new Date(date);
+
+  return d.toLocaleDateString("en-GB", {
+    day: "2-digit",
     month: "short",
-    day: "numeric",
+    year: "numeric",
   });
+}
+export function formatMemberNo(memberNo: number) {
+  return `M-${String(memberNo).padStart(4, "0")}`;
 }

@@ -7,7 +7,7 @@ import type {
   DeviceModel,
 } from "@/lib/generated/prisma/models";
 import DetailStat from "./DetailStat";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatMemberNo } from "@/lib/format";
 
 type MemberDetail = {
   member: MemberModel;
@@ -94,7 +94,9 @@ export default function MembersTab({ members, refresh }: MembersTabProps) {
                     )}
                   </td>
                   <td className="py-2.5 pr-3 text-text-dim">{m.phone}</td>
-                  <td className="py-2.5 pr-3 text-text-dim">{m.id}</td>
+                  <td className="py-2.5 pr-3 text-text-dim font-semibold">
+                    {formatMemberNo(m.memberNo)}
+                  </td>
                   <td className="py-2.5 pr-3 font-bold text-gold">
                     {m.points}
                   </td>
@@ -165,7 +167,7 @@ export default function MembersTab({ members, refresh }: MembersTabProps) {
             <div className="grid grid-cols-2 gap-2.5 mb-4">
               <DetailStat
                 label="Member ID"
-                value={memberDetail.member.id}
+                value={formatMemberNo(memberDetail.member.memberNo)}
                 small
               />
               <DetailStat

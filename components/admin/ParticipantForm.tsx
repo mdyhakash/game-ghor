@@ -2,9 +2,15 @@ import { useState } from "react";
 import { api, getErrorMessage } from "@/lib/api-client";
 import type { Participant } from "@/lib/data";
 
+type ParticipantFormParticipant = {
+  id: string;
+  tournamentId: string;
+  name: string;
+  phone: string | null;
+};
 interface ParticipantFormProps {
   tournamentId: string;
-  participants: Participant[];
+  participants: ParticipantFormParticipant[];
   status: string;
   onRefresh: () => void;
 }

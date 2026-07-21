@@ -13,6 +13,7 @@ export async function GET() {
 
   const result = members.map((m) => ({
     id: m.id,
+    memberNo: m.memberNo,
     name: m.name,
     phone: m.phone,
     points: m.points,

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { api } from "@/lib/api-client";
 import AdminSidebar from "@/app/admin/AdminSidebar";
 import AdminLoading from "@/components/admin/AdminLoading";
-
+import { ToastProvider } from "@/components/Toast";
 export default function AdminDashboardLayout({
   children,
 }: {
@@ -32,9 +32,11 @@ export default function AdminDashboardLayout({
   }
 
   return (
-    <div className="md:flex">
-      <AdminSidebar />
-      <div className="flex-1 min-w-0 px-4.5 md:px-6">{children}</div>
-    </div>
+    <ToastProvider>
+      <div className="md:flex">
+        <AdminSidebar />
+        <div className="flex-1 min-w-0 px-4.5 md:px-6">{children}</div>
+      </div>
+    </ToastProvider>
   );
 }

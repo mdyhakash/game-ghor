@@ -1,5 +1,6 @@
 model Member {
   id               String           @id @default(cuid())
+  memberNo         Int              @unique @default(autoincrement())
   phone            String           @unique
   password         String
   name             String

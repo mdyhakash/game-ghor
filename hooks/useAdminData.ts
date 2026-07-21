@@ -19,6 +19,7 @@ export type Stats = {
 };
 export type MemberRow = {
   id: string;
+  memberNo: number;
   name: string;
   phone: string;
   points: number;

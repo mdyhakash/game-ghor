@@ -14,7 +14,7 @@ export type BookingStatus = "WAITING" | "ACTIVE" | "COMPLETED" | "CANCELLED";
 
 export type Device = {
   id: string;
-  name: string; // "PC 3", "PS5 - A"
+  name: string;
   type: DeviceType;
   status: DeviceStatus;
   pricePerHour: number;
@@ -23,108 +23,32 @@ export type Device = {
 export type Member = {
   id: string;
   phone: string;
-  password: string; // plaintext — fine for this frontend-only demo, never do this with a real backend
+  password: string;
   name: string;
   tier: Tier;
-  membershipStatus: MembershipStatus; // PENDING until admin approves (after payment), then APPROVED
+  membershipStatus: MembershipStatus;
   points: number;
   totalHours: number;
-  createdAt: string;
+  createdAt: Date;
 };
 
 export type Booking = {
   id: string;
-  token: string; // short human-facing token, e.g. "014"
+  token: string;
   deviceId: string;
   memberId?: string;
   guestPhone?: string;
-  startTime: string; // ISO
-  endTime: string; // ISO
+  startTime: string;
+  endTime: string;
   durationHrs: number;
   status: BookingStatus;
   basePrice: number;
-  discountApplied: number; // fraction, e.g. 0.10
+  discountApplied: number;
   finalPrice: number;
   pointsEarned: number;
-  paid: boolean; // member points/hours are only credited once this is true (set by admin)
-  createdAt: string;
+  paid: boolean;
+  createdAt: Date;
 };
-
-// -----------------------------------------------------------------------
-// Devices — this was prisma/seed.ts. Edit this list to add/remove machines.
-// -----------------------------------------------------------------------
-export const DEVICES: Device[] = [
-  {
-    id: "pc-1",
-    name: "PC 1",
-    type: "PC",
-    status: "AVAILABLE",
-    pricePerHour: 60,
-  },
-  {
-    id: "pc-2",
-    name: "PC 2",
-    type: "PC",
-    status: "AVAILABLE",
-    pricePerHour: 60,
-  },
-  {
-    id: "pc-3",
-    name: "PC 3",
-    type: "PC",
-    status: "AVAILABLE",
-    pricePerHour: 60,
-  },
-  {
-    id: "pc-4",
-    name: "PC 4",
-    type: "PC",
-    status: "AVAILABLE",
-    pricePerHour: 60,
-  },
-  {
-    id: "pc-5",
-    name: "PC 5",
-    type: "PC",
-    status: "AVAILABLE",
-    pricePerHour: 60,
-  },
-  {
-    id: "ps5-a",
-    name: "PS5 - A",
-    type: "PS5",
-    status: "AVAILABLE",
-    pricePerHour: 100,
-  },
-  {
-    id: "ps5-b",
-    name: "PS5 - B",
-    type: "PS5",
-    status: "AVAILABLE",
-    pricePerHour: 100,
-  },
-  {
-    id: "ps4-a",
-    name: "PS4 - A",
-    type: "PS4",
-    status: "AVAILABLE",
-    pricePerHour: 70,
-  },
-  {
-    id: "ps4-b",
-    name: "PS4 - B",
-    type: "PS4",
-    status: "AVAILABLE",
-    pricePerHour: 70,
-  },
-  {
-    id: "ps4-c",
-    name: "PS4 - C",
-    type: "PS4",
-    status: "AVAILABLE",
-    pricePerHour: 70,
-  },
-];
 
 export const DEVICE_META: Record<
   DeviceType,
@@ -154,19 +78,19 @@ export const DEVICE_META: Record<
     sub: "FIFA, GTA, and more",
   },
 
-  MOBILE: {
+  Mobile: {
     iconKey: "MOBILE",
     title: "Mobile",
     sub: "eFootball, Free Fire, PUBG",
   },
 
-  RACING: {
+  Racing: {
     iconKey: "RACING",
     title: "Racing Simulator",
     sub: "Steering wheel & pedal setup",
   },
 
-  ARCADE: {
+  Arcade: {
     iconKey: "ARCADE",
     title: "Arcade Machine",
     sub: "Classic arcade games",
@@ -181,9 +105,9 @@ export const DEVICE_META: Record<
 // -----------------------------------------------------------------------
 // Contact — placeholder number. Replace both with the real cafe number.
 // -----------------------------------------------------------------------
-export const CAFE_PHONE = "+8801605586019"; // used in tel: link
-export const CAFE_PHONE_DISPLAY = "+8801605586019"; // shown to users
-export const CAFE_ADDRESS = "House 12, Road 5, Dhanmondi, Dhaka"; // placeholder — replace with real address
+export const CAFE_PHONE = "+8801605586019";
+export const CAFE_PHONE_DISPLAY = "+8801605586019";
+export const CAFE_ADDRESS = "House 12, Road 5, Dhanmondi, Dhaka";
 
 // -----------------------------------------------------------------------
 // Games — shown on the home page "Games available" section + /games page.
@@ -286,15 +210,15 @@ export type Tournament = {
   startDate: string; // ISO date
   description: string;
   status: TournamentStatus;
-  createdAt: string;
+  createdAt: Date;
 };
 
 export type Participant = {
   id: string;
   tournamentId: string;
   name: string;
-  phone?: string;
-  createdAt: string;
+  phone?: string | null;
+  createdAt: Date;
 };
 
 export type Match = {
@@ -321,7 +245,6 @@ export function nextPowerOfTwo(n: number): number {
 // Admin — this is a frontend-only demo, so "auth" is a single shared
 // password rather than real accounts. Change this before sharing the app.
 // -----------------------------------------------------------------------
-
 
 // -----------------------------------------------------------------------
 // Tiers & pricing — this was lib/pricing.ts.

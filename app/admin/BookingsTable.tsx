@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
-import { api } from "@/lib/api-client";
+import { api, getErrorMessage } from "@/lib/api-client";
 import type { BookingStatus } from "@/lib/data";
 import type { Bookings, Devices } from "@/hooks/useAdminData";
 import { formatCountdown } from "@/lib/format";
-
+import { useToast } from "@/components/Toast";
 const BOOKING_STATUSES: BookingStatus[] = [
   "WAITING",
   "ACTIVE",
@@ -58,7 +58,7 @@ export default function BookingsTable({
   const [flatPage, setFlatPage] = useState(1);
 
   const todayKey = useMemo(() => dateKeyOf(new Date()), []);
-
+  const { showToast, confirmToast } = useToast();
   async function handleBookingStatus(id: string, status: BookingStatus) {
     await api.patch(`/admin/bookings/${id}/status`, { status });
     refresh();
@@ -67,6 +67,22 @@ export default function BookingsTable({
   async function handleMarkPaid(id: string) {
     await api.post(`/admin/bookings/${id}/paid`);
     refresh();
+  }
+  async function handleDelete(id: string) {
+    const ok = await confirmToast(
+      "Delete this booking? This can't be undone.",
+      {
+        confirmLabel: "Delete",
+      },
+    );
+    if (!ok) return;
+    try {
+      await api.delete(`/admin/bookings/${id}`);
+      showToast("Booking deleted", "success");
+      refresh();
+    } catch (err) {
+      showToast(getErrorMessage(err), "error");
+    }
   }
 
   const isFiltering =
@@ -190,6 +206,14 @@ export default function BookingsTable({
             <span className="text-[11px] text-text-dim">—</span>
           )}
         </td>
+        <td className="py-2.5 pr-3">
+          <button
+            onClick={() => handleDelete(b.id)}
+            className="text-[11px] font-semibold text-pink bg-(--pink-dim) border border-pink px-2.5 py-1 rounded-full whitespace-nowrap"
+          >
+            Delete
+          </button>
+        </td>
       </tr>
     );
   }
@@ -205,6 +229,7 @@ export default function BookingsTable({
         <th className="py-2 pr-3">Price</th>
         <th className="py-2 pr-3">Status</th>
         <th className="py-2 pr-3">Payment</th>
+        <th className="py-2 pr-3">Delete</th>
       </tr>
     </thead>
   );
@@ -330,7 +355,11 @@ export default function BookingsTable({
                   <tbody>{pageItems.map(renderRow)}</tbody>
                 </table>
               </div>
-              <Pager page={page} totalPages={totalPages} onChange={setFlatPage} />
+              <Pager
+                page={page}
+                totalPages={totalPages}
+                onChange={setFlatPage}
+              />
             </>
           );
         })()

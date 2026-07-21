@@ -5,6 +5,7 @@ import BracketView, {
   type MatchView,
 } from "@/components/admin/bracket/BracketView";
 import ParticipantForm from "./ParticipantForm";
+import { useToast } from "@/components/Toast";
 
 type Detail = {
   tournament: TournamentModel;
@@ -58,6 +59,7 @@ export default function TournamentDetail({
   const [editDescription, setEditDescription] = useState(
     detail.tournament.description,
   );
+  const { showToast, confirmToast } = useToast();
 
   async function handleGenerateFixture() {
     setFixtureError(null);
@@ -106,15 +108,18 @@ export default function TournamentDetail({
   }
 
   async function handleDelete() {
-    if (
-      !window.confirm(
-        `Delete "${detail.tournament.name}"? This removes all its players and matches too.`,
-      )
-    ) {
-      return;
+    const ok = await confirmToast(
+      `Delete "${detail.tournament.name}"? This removes all its players and matches too.`,
+      { confirmLabel: "Delete" },
+    );
+    if (!ok) return;
+    try {
+      await api.delete(`/admin/tournaments/${detail.tournament.id}`);
+      showToast("Tournament deleted", "success");
+      onRefresh();
+    } catch (err) {
+      showToast(getErrorMessage(err), "error");
     }
-    await api.delete(`/admin/tournaments/${detail.tournament.id}`);
-    onRefresh();
   }
 
   return (

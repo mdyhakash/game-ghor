@@ -3,6 +3,7 @@ import { api, getErrorMessage } from "@/lib/api-client";
 import type { DeviceStatus, DeviceType } from "@/lib/data";
 import type { Devices } from "@/hooks/useAdminData";
 import { DEVICE_META } from "@/lib/data";
+import { useToast } from "@/components/Toast";
 
 const DEVICE_TYPES = Object.keys(DEVICE_META) as DeviceType[];
 
@@ -24,6 +25,7 @@ export default function DeviceGrid({ devices, refresh }: DeviceGridProps) {
   const [editDevicePrice, setEditDevicePrice] = useState(0);
   const [editDeviceError, setEditDeviceError] = useState<string | null>(null);
   const [editDeviceSaving, setEditDeviceSaving] = useState(false);
+  const { showToast, confirmToast } = useToast();
 
   async function handleAddDevice(e: React.FormEvent) {
     e.preventDefault();
@@ -84,12 +86,16 @@ export default function DeviceGrid({ devices, refresh }: DeviceGridProps) {
   }
 
   async function handleDeleteDevice(deviceId: string, name: string) {
-    if (!window.confirm(`Delete "${name}"? This can't be undone.`)) return;
+    const ok = await confirmToast(`Delete "${name}"? This can't be undone.`, {
+      confirmLabel: "Delete",
+    });
+    if (!ok) return;
     try {
       await api.delete(`/admin/devices/${deviceId}`);
+      showToast("Device deleted", "success");
       refresh();
     } catch (err) {
-      window.alert(getErrorMessage(err));
+      showToast(getErrorMessage(err), "error");
     }
   }
 
