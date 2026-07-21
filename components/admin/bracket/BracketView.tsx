@@ -15,6 +15,7 @@ export type MatchView = {
   participantAName: string | null;
   participantBName: string | null;
   winnerId: string | null;
+  winnerName: string | null;
   scoreA: number | null;
   scoreB: number | null;
   status: "PENDING" | "COMPLETED";
