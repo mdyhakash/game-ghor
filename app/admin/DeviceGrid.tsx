@@ -2,8 +2,9 @@ import { useState } from "react";
 import { api, getErrorMessage } from "@/lib/api-client";
 import type { DeviceStatus, DeviceType } from "@/lib/data";
 import type { Devices } from "@/hooks/useAdminData";
+import { DEVICE_META } from "@/lib/data";
 
-const DEVICE_TYPES: DeviceType[] = ["PC", "PS4", "PS5"];
+const DEVICE_TYPES = Object.keys(DEVICE_META) as DeviceType[];
 
 interface DeviceGridProps {
   devices: Devices;
@@ -99,7 +100,7 @@ export default function DeviceGrid({ devices, refresh }: DeviceGridProps) {
       </div>
       <form
         onSubmit={handleAddDevice}
-        className="bg-card border border-line rounded-2xl p-4 flex flex-col md:flex-row md:items-end gap-3 mb-3"
+        className="bg-card border border-line rounded-2xl p-4 flex flex-col gap-4 mb-3 max-w-md"
       >
         <div className="flex-1">
           <label className="text-[11px] font-semibold text-text-dim mb-1.5 block">
@@ -116,7 +117,7 @@ export default function DeviceGrid({ devices, refresh }: DeviceGridProps) {
           <label className="text-[11px] font-semibold text-text-dim mb-1.5 block">
             Type
           </label>
-          <div className="flex gap-1.5">
+          <div className="grid grid-cols-2 gap-2">
             {DEVICE_TYPES.map((t) => (
               <button
                 type="button"

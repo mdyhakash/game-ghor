@@ -3,7 +3,9 @@ import { api, getErrorMessage } from "@/lib/api-client";
 import type { DeviceType } from "@/lib/data";
 import type { Devices } from "@/hooks/useAdminData";
 
-const DEVICE_TYPES: DeviceType[] = ["PC", "PS4", "PS5"];
+import { DEVICE_META } from "@/lib/data";
+
+const DEVICE_TYPES = Object.keys(DEVICE_META) as DeviceType[];
 
 interface WalkInBookingFormProps {
   devices: Devices;
@@ -49,13 +51,13 @@ export default function WalkInBookingForm({
       </div>
       <form
         onSubmit={handleWalkInSubmit}
-        className="bg-card border border-line rounded-2xl p-4 flex flex-col md:flex-row md:items-end gap-3"
+        className="bg-card border border-line rounded-2xl p-4 grid grid-cols-1  gap-4"
       >
         <div className="flex-1">
           <label className="text-[11px] font-semibold text-text-dim mb-1.5 block">
             Device
           </label>
-          <div className="flex gap-1.5">
+          <div className="grid grid-cols-2 gap-2">
             {DEVICE_TYPES.map((t) => (
               <button
                 type="button"
