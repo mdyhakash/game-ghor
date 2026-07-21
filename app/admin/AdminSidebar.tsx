@@ -32,7 +32,7 @@ export default function AdminSidebar() {
       {/* desktop: fixed left sidebar */}
       <aside className="hidden md:flex md:flex-col md:w-56 md:shrink-0 md:h-screen md:sticky md:top-0 border-r border-line bg-card px-3 py-5">
         <div className="px-2 pb-6">
-          <div className="font-display text-lg font-bold">Level Up</div>
+          <div className="font-display text-lg font-bold">Game Ghor</div>
           <div className="text-[11px] text-text-dim mt-0.5">Admin panel</div>
         </div>
 

@@ -1,13 +1,27 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { GAMES } from "@/lib/data";
+import Image from "next/image";
+import { api } from "@/lib/api-client";
 
+type Game = {
+  id: string;
+  name: string;
+  genre: string;
+  imageUrl: string;
+};
 
 const PREVIEW_COUNT = 6;
 
 export default function GamesAvailable() {
-  const preview = GAMES.slice(0, PREVIEW_COUNT);
+  const [games, setGames] = useState<Game[]>([]);
+
+  useEffect(() => {
+    api.get<Game[]>("/games").then((res) => setGames(res.data));
+  }, []);
+
+  const preview = games.slice(0, PREVIEW_COUNT);
 
   return (
     <div className="px-4.5 md:px-0 pt-5 md:pt-8 pb-2">
@@ -19,14 +33,22 @@ export default function GamesAvailable() {
         {preview.map((game) => (
           <div
             key={game.id}
-            className={`relative aspect-3/4 rounded-2xl overflow-hidden border border-line bg-linear-to-br ${game.color} flex items-end`}
+            className="relative aspect-3/4 rounded-2xl overflow-hidden border border-line flex items-end"
           >
-            <span className="absolute top-2 left-2 text-[9.5px] font-bold px-2 py-0.5 rounded-full bg-black/40 backdrop-blur text-white">
+            <Image
+              src={game.imageUrl}
+              alt={game.name}
+              fill
+              className="object-cover"
+            />
+
+            <span className="absolute top-2 left-2 z-10 text-[9.5px] font-bold px-2 py-0.5 rounded-full bg-black/40 backdrop-blur text-white">
               {game.genre}
             </span>
-            <div className="w-full p-2.5 bg-linear-to-t from-black/80 to-transparent">
+
+            <div className="relative z-10 w-full p-2.5 bg-linear-to-t from-black/80 to-transparent">
               <div className="font-display font-bold text-[13px] leading-tight text-white">
-                {game.title}
+                {game.name}
               </div>
             </div>
           </div>

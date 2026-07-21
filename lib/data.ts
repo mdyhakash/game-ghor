@@ -134,65 +134,6 @@ export type Game = {
   posterUrl?: string;
 };
 
-export const GAMES: Game[] = [
-  {
-    id: "valorant",
-    title: "Valorant",
-    genre: "Tactical FPS",
-    devices: ["PC"],
-    color: "from-[#ff2e93] to-[#7c5cff]",
-  },
-  {
-    id: "cs2",
-    title: "Counter-Strike 2",
-    genre: "Tactical FPS",
-    devices: ["PC"],
-    color: "from-[#b6ff3c] to-[#1a5c3c]",
-  },
-  {
-    id: "fortnite",
-    title: "Fortnite",
-    genre: "Battle Royale",
-    devices: ["PC"],
-    color: "from-[#7c5cff] to-[#ff2e93]",
-  },
-  {
-    id: "fifa25",
-    title: "FIFA 25",
-    genre: "Sports",
-    devices: ["PS4", "PS5", "PC"],
-    color: "from-[#ffcb47] to-[#ff6f3c]",
-  },
-  {
-    id: "gta5",
-    title: "GTA V",
-    genre: "Open World",
-    devices: ["PS4", "PS5", "PC"],
-    color: "from-[#3c6bff] to-[#0c0b12]",
-  },
-  {
-    id: "efootball",
-    title: "eFootball",
-    genre: "Sports",
-    devices: ["PS4", "PS5"],
-    color: "from-[#3cffb6] to-[#1a3c5c]",
-  },
-  {
-    id: "godofwar",
-    title: "God of War",
-    genre: "Action",
-    devices: ["PS5"],
-    color: "from-[#a29cb8] to-[#0c0b12]",
-  },
-  {
-    id: "pubg",
-    title: "PUBG: Battlegrounds",
-    genre: "Battle Royale",
-    devices: ["PC"],
-    color: "from-[#ffcb47] to-[#3c6bff]",
-  },
-];
-
 export const TYPE_LABEL: Record<DeviceType, string> = {
   PC: "Gaming PC",
   PS3: "PS3",
