@@ -2,10 +2,12 @@
 
 import { useAdminData } from "@/hooks/useAdminData";
 import BookingsTable from "../../BookingsTable";
+import AdminLoading from "@/components/admin/AdminLoading";
 
 
 export default function AdminBookingsPage() {
-  const { bookings, devices, now, refresh } = useAdminData();
+  const { bookings, devices, now, refresh,loading } = useAdminData();
+  if (loading) return <AdminLoading label="Loading bookings..." />;
 
   return (
     <div className="pb-10">

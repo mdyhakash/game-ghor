@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { api } from "@/lib/api-client";
+import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 import {
   RiDashboardLine,
   RiComputerLine,
@@ -20,11 +20,9 @@ const NAV_ITEMS = [
 
 export default function AdminSidebar() {
   const pathname = usePathname();
-  const router = useRouter();
 
   async function handleLogout() {
-    await api.post("/admin/auth/logout");
-    router.push("/admin/login");
+    await signOut({ callbackUrl: "/admin/login" });
   }
 
   return (

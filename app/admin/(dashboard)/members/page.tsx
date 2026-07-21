@@ -2,9 +2,11 @@
 
 import { useAdminData } from "@/hooks/useAdminData";
 import MembersTab from "@/components/MembersTab";
+import AdminLoading from "@/components/admin/AdminLoading";
 
 export default function AdminMembersPage() {
-  const { members, refresh } = useAdminData();
+  const { members, refresh, loading } = useAdminData();
+  if (loading) return <AdminLoading label="Loading members..." />;
 
   return (
     <div className="pb-10">

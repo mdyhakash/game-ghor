@@ -5,6 +5,10 @@ import {
   RiAwardLine,
   RiTrophyLine,
   RiVipDiamondLine,
+  RiRoadsterLine,
+  RiSmartphoneLine,
+  RiGhostSmileLine,
+  RiRadarLine,
 } from "react-icons/ri";
 import type { IconType } from "react-icons";
 
@@ -12,7 +16,12 @@ import type { IconType } from "react-icons";
 const ICON_MAP: Record<string, IconType> = {
   PC: RiComputerLine,
   PS5: RiGamepadLine,
-  PS4: RiGamepadLine,      // or choose another icon
+  PS4: RiGamepadLine,
+  PS3: RiGamepadLine,
+  RACING: RiRoadsterLine,
+  VR: RiRadarLine,
+  MOBILE: RiSmartphoneLine,
+  ARCADE: RiGhostSmileLine,
   BRONZE: RiMedalLine,
   SILVER: RiAwardLine,
   GOLD: RiTrophyLine,
@@ -26,8 +35,18 @@ interface GameIconProps {
 }
 
 /** Renders the correct react-icon for a given iconKey from DEVICE_META or TIER_INFO */
-export default function GameIcon({ iconKey, className, size = "1.25em" }: GameIconProps) {
+export default function GameIcon({
+  iconKey,
+  className,
+  size = "1.25em",
+}: GameIconProps) {
   const Icon = ICON_MAP[iconKey];
   if (!Icon) return null;
-  return <Icon size={size} className={className} style={{ display: "inline-block", verticalAlign: "middle" }} />;
+  return (
+    <Icon
+      size={size}
+      className={className}
+      style={{ display: "inline-block", verticalAlign: "middle" }}
+    />
+  );
 }

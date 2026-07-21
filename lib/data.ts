@@ -154,20 +154,20 @@ export const DEVICE_META: Record<
     sub: "FIFA, GTA, and more",
   },
 
-  Mobile: {
-    iconKey: "Mobile",
+  MOBILE: {
+    iconKey: "MOBILE",
     title: "Mobile",
     sub: "eFootball, Free Fire, PUBG",
   },
 
-  Racing: {
-    iconKey: "Racing",
+  RACING: {
+    iconKey: "RACING",
     title: "Racing Simulator",
     sub: "Steering wheel & pedal setup",
   },
 
-  Arcade: {
-    iconKey: "Arcade",
+  ARCADE: {
+    iconKey: "ARCADE",
     title: "Arcade Machine",
     sub: "Classic arcade games",
   },
