@@ -99,13 +99,19 @@ export default function BracketMatch({
         <div className="absolute top-1 left-2 text-[9px] text-text-dim font-semibold tracking-wide z-10">
           M{matchNumber}
         </div>
-        {isReady && onRecordResult && (
+        {(isReady || isDone) && onRecordResult && (
           <button
             onClick={() => onRecordResult(match)}
-            className="absolute top-1 right-1.5 z-10 text-[9px] font-bold text-gold bg-(--gold-dim) border border-gold px-1.5 py-0.5 rounded-full flex items-center gap-1"
+            className={`absolute top-1 right-1.5 z-10 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1 ${
+              isReady
+                ? "text-gold bg-(--gold-dim) border border-gold"
+                : "text-text-dim bg-bg-soft border border-line"
+            }`}
           >
-            <span className="w-1.25 h-1.25 rounded-full bg-gold pulse-dot" />
-            RECORD
+            {isReady && (
+              <span className="w-1.25 h-1.25 rounded-full bg-gold pulse-dot" />
+            )}
+            {isReady ? "RECORD" : "EDIT"}
           </button>
         )}
         {isReady && !onRecordResult && (

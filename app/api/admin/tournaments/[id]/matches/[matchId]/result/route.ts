@@ -42,6 +42,27 @@ export async function POST(
     participantCount > 0 ? nextPowerOfTwo(participantCount) : 0;
   const totalRounds = bracketSize > 1 ? Math.log2(bracketSize) : 0;
 
+  const isCorrection = match.status === "COMPLETED";
+
+  // Editing an already-recorded result: only safe if the next round hasn't
+  // been played off this match's winner yet.
+  if (isCorrection && match.round < totalRounds) {
+    const nextRound = match.round + 1;
+    const nextIndex = Math.floor(match.matchIndex / 2);
+    const nextMatch = await prisma.match.findFirst({
+      where: { tournamentId, round: nextRound, matchIndex: nextIndex },
+    });
+    if (nextMatch && nextMatch.status === "COMPLETED") {
+      return NextResponse.json(
+        {
+          error:
+            "Undo the next round's recorded result first, then correct this match.",
+        },
+        { status: 409 },
+      );
+    }
+  }
+
   await prisma.match.update({
     where: { id: matchId },
     data: {

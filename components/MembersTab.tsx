@@ -56,9 +56,6 @@ export default function MembersTab({ members, refresh }: MembersTabProps) {
   const filteredMembers = members.filter((m) =>
     m.phone.includes(memberSearch.trim()),
   );
-
-  // ... the rest of your JSX (search input, table, modal) stays exactly
-  // the same — it already reads from `filteredMembers` and `memberDetail`.
   return (
     <>
       {/* members tab search */}
@@ -87,11 +84,7 @@ export default function MembersTab({ members, refresh }: MembersTabProps) {
             </thead>
             <tbody>
               {filteredMembers.map((m) => (
-                <tr
-                  key={m.id}
-                  onClick={() => openMember(m.id)}
-                  className="border-t border-line cursor-pointer hover:bg-bg-soft"
-                >
+                <tr key={m.id} className="border-t border-line">
                   <td className="py-2.5 pr-3 font-semibold">
                     {m.name}
                     {m.membershipStatus === "PENDING" && (
@@ -104,6 +97,14 @@ export default function MembersTab({ members, refresh }: MembersTabProps) {
                   <td className="py-2.5 pr-3 text-text-dim">{m.id}</td>
                   <td className="py-2.5 pr-3 font-bold text-gold">
                     {m.points}
+                  </td>
+                  <td className="py-2.5 pr-3">
+                    <button
+                      onClick={() => openMember(m.id)}
+                      className="text-[11.5px] font-semibold text-text-dim bg-bg-soft border border-line px-2.5 py-1 rounded-full whitespace-nowrap cursor-pointer"
+                    >
+                      See details
+                    </button>
                   </td>
                 </tr>
               ))}

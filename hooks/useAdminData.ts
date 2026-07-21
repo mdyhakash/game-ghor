@@ -34,14 +34,24 @@ export function useAdminData() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [members, setMembers] = useState<Members>([]);
   const [now, setNow] = useState(() => Date.now());
+  const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(() => {
-    api.get<Devices>("/devices").then((res) => setDevices(res.data));
-    api.get<Bookings>("/admin/bookings").then((res) => setBookings(res.data));
-    api.get<Stats>("/admin/stats").then((res) => setStats(res.data));
-    api.get<Members>("/admin/members").then((res) => setMembers(res.data));
+    return Promise.all([
+      api.get<Devices>("/devices").then((res) => setDevices(res.data)),
+      api.get<Bookings>("/admin/bookings").then((res) => setBookings(res.data)),
+      api.get<Stats>("/admin/stats").then((res) => setStats(res.data)),
+      api.get<Members>("/admin/members").then((res) => setMembers(res.data)),
+    ]);
   }, []);
 
+  // Load data as soon as this hook mounts.
+  useEffect(() => {
+    refresh().finally(() => setLoading(false));
+  }, [refresh]);
+
+  // Ticks every second so ACTIVE sessions' countdowns stay live, and
+  // auto-completes any session whose timer has run out.
   useEffect(() => {
     const interval = setInterval(() => {
       api.get<Bookings>("/admin/bookings").then((res) => {
@@ -67,5 +77,5 @@ export function useAdminData() {
     return () => clearInterval(interval);
   }, [refresh]);
 
-  return { devices, bookings, stats, members, now, refresh };
+  return { devices, bookings, stats, members, now, refresh, loading };
 }

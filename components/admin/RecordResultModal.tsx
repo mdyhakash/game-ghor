@@ -12,9 +12,15 @@ export default function RecordResultModal({
   onClose,
   onSubmit,
 }: RecordResultModalProps) {
-  const [resultWinnerId, setResultWinnerId] = useState<string | null>(null);
-  const [scoreA, setScoreA] = useState("");
-  const [scoreB, setScoreB] = useState("");
+  const [resultWinnerId, setResultWinnerId] = useState<string | null>(
+    match.winnerId,
+  );
+  const [scoreA, setScoreA] = useState(
+    match.scoreA != null ? String(match.scoreA) : "",
+  );
+  const [scoreB, setScoreB] = useState(
+    match.scoreB != null ? String(match.scoreB) : "",
+  );
 
   function handleSubmit() {
     if (!resultWinnerId) return;
@@ -34,7 +40,9 @@ export default function RecordResultModal({
         className="bg-card border border-line rounded-2xl w-full max-w-sm p-5"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="font-display text-lg font-bold mb-4">Record result</div>
+        <div className="font-display text-lg font-bold mb-4">
+          {match.status === "COMPLETED" ? "Edit result" : "Record result"}
+        </div>
 
         <div className="flex flex-col gap-2 mb-4">
           {[
